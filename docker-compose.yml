@@ -30,29 +30,38 @@ services:
   # 后端服务
   backend:
     build:
-      context: ./backend
-      dockerfile: docker/backend/Dockerfile
+      context: .
+      dockerfile: backend/Dockerfile
     container_name: ting_backend
     ports:
       - "8000:8000"
     environment:
       - DATABASE_URL=postgresql://ting_user:ting_password@postgres:5432/ting_db
       - REDIS_URL=redis://redis:6379
-      - SECRET_KEY=your-secret-key
+      - SECRET_KEY=your-secret-key-change-in-production
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - WECHAT_APP_ID=
+      - WECHAT_APP_SECRET=
     depends_on:
       - postgres
       - redis
+    volumes:
+      - ./backend:/app
     networks:
       - ting_network
 
   # 前端管理后台
   admin-frontend:
     build:
-      context: ./frontend/admin
-      dockerfile: docker/frontend/Dockerfile
+      context: .
+      dockerfile: frontend/admin/Dockerfile
     container_name: ting_admin_frontend
     ports:
       - "3000:80"
+    environment:
+      - VUE_APP_API_BASE_URL=http://localhost:8000/api/v1
+    volumes:
+      - ./frontend/admin:/app
     networks:
       - ting_network
 
