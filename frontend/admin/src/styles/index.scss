@@ -1,0 +1,155 @@
+// 全局样式
+body {
+  margin: 0;
+  padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #303133;
+  background-color: #f0f2f5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+// 通用卡片样式
+.el-card {
+  box-shadow: 0 1px 3px 0 rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.04);
+}
+
+// 表格样式
+.el-table {
+  border: 1px solid #ebeef5;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+// 按钮样式
+.el-button {
+  border-radius: 4px;
+}
+
+// 分页样式
+.el-pagination {
+  text-align: center;
+  margin-top: 20px;
+}
+
+// 加载动画
+.el-loading-spinner {
+  font-size: 14px;
+}
+
+// 标签样式
+.el-tag {
+  border-radius: 4px;
+}
+
+// 表单样式
+.el-form-item {
+  margin-bottom: 20px;
+}
+
+// 输入框样式
+.el-input__wrapper {
+  border-radius: 4px;
+}
+
+// 弹窗样式
+.el-dialog {
+  border-radius: 8px;
+}
+
+// 布局样式
+.el-container {
+  min-height: 100vh;
+}
+
+.el-aside {
+  background-color: #304156;
+  color: #bfcbd9;
+}
+
+.el-header {
+  background-color: #fff;
+  color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 1px 4px rgba(0,21,41,.08);
+}
+
+.el-main {
+  background-color: #f0f2f5;
+  padding: 20px;
+}
+
+// 通用工具类
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.ml-10 {
+  margin-left: 10px;
+}
+
+.mr-10 {
+  margin-right: 10px;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.no-wrap {
+  white-space: nowrap;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.text-ellipsis {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .el-container {
+    flex-direction: column;
+  }
+  
+  .el-aside {
+    width: 100% !important;
+    height: auto;
+  }
+  
+  .el-main {
+    padding: 10px;
+  }
+}
