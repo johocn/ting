@@ -5,7 +5,10 @@ from app.core.config import settings
 from app.api import router
 
 # 创建数据库表
-Base.metadata.create_all(bind=engine)
+try:
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(f"Database initialization error: {e}")
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -27,7 +30,11 @@ app.include_router(router, prefix=settings.API_V1_STR)
 
 @app.get("/")
 async def root():
-    return {"message": "Ting Learning Platform API"}
+    return {"message": "Ting Learning Platform API", "version": settings.VERSION}
+
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "version": settings.VERSION}
 
 if __name__ == "__main__":
     import uvicorn
