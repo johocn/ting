@@ -1,0 +1,118 @@
+version: '3.8'
+
+services:
+  # PostgreSQL数据库
+  postgres:
+    image: postgres:13
+    container_name: ting_postgres_prod
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-ting_db}
+      POSTGRES_USER: ${POSTGRES_USER:-ting_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ting_password}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - ting_network
+    restart: unless-stopped
+
+  # Redis缓存
+  redis:
+    image: redis:6-alpine
+    container_name: ting_redis_prod
+    command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-ting_redis_password}
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - ting_network
+    restart: unless-stopped
+
+  # 后端服务
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: ting_backend_prod
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    environment:
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-ting_user}:${POSTGRES_PASSWORD:-ting_password}@postgres:5432/${POSTGRES_DB:-ting_db}
+      - REDIS_URL=redis://:${REDIS_PASSWORD:-ting_redis_password}@redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:-your-very-secure-secret-key-change-in-production}
+      - ACCESS_TOKEN_EXPIRE_MINUTES=${ACCESS_TOKEN_EXPIRE_MINUTES:-1440}
+      - DEBUG=${DEBUG:-false}
+      - ENVIRONMENT=${ENVIRONMENT:-production}
+      - WECHAT_APP_ID=${WECHAT_APP_ID}
+      - WECHAT_APP_SECRET=${WECHAT_APP_SECRET}
+      - ALIBABA_ACCESS_KEY_ID=${ALIBABA_ACCESS_KEY_ID}
+      - ALIBABA_ACCESS_KEY_SECRET=${ALIBABA_ACCESS_KEY_SECRET}
+      - OSS_ACCESS_KEY_ID=${OSS_ACCESS_KEY_ID}
+      - OSS_ACCESS_KEY_SECRET=${OSS_ACCESS_KEY_SECRET}
+      - OSS_ENDPOINT=${OSS_ENDPOINT}
+      - OSS_BUCKET_NAME=${OSS_BUCKET_NAME}
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./backend:/app
+    networks:
+      - ting_network
+    restart: unless-stopped
+
+  # 管理后台前端
+  admin-frontend:
+    build:
+      context: .
+      dockerfile: frontend/admin/Dockerfile
+    container_name: ting_admin_frontend_prod
+    ports:
+      - "${ADMIN_PORT:-3000}:80"
+    environment:
+      - VUE_APP_API_BASE_URL=${API_BASE_URL:-http://localhost:8000}
+    networks:
+      - ting_network
+    restart: unless-stopped
+
+  # 移动端前端 (如果需要)
+  mobile-frontend:
+    build:
+      context: .
+      dockerfile: frontend/mobile/Dockerfile
+    container_name: ting_mobile_frontend_prod
+    ports:
+      - "${MOBILE_PORT:-3001}:80"
+    environment:
+      - VUE_APP_API_BASE_URL=${API_BASE_URL:-http://localhost:8000}
+    networks:
+      - ting_network
+    restart: unless-stopped
+
+  # Nginx反向代理
+  nginx:
+    image: nginx:alpine
+    container_name: ting_nginx_prod
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf
+      - ./ssl:/etc/nginx/ssl
+    depends_on:
+      - backend
+      - admin-frontend
+      - mobile-frontend
+    networks:
+      - ting_network
+    restart: unless-stopped
+
+networks:
+  ting_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  redis_data:
