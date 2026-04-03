@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <title>消息通知 - Ting 学习平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 70px;
+        }
+        
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px 0;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            background: white;
+            border-radius: 15px;
+            padding: 5px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .filter-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            color: #666;
+        }
+        
+        .filter-tab.active {
+            background: #409eff;
+            color: white;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .unread-count {
+            background: #f56c6c;
+            color: white;
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        
+        .notification-list {
+            margin-top: 10px;
+        }
+        
+        .notification-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            cursor: pointer;
+        }
+        
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        
+        .notification-item.unread {
+            background: #f8f9fa;
+            border-left: 3px solid #409eff;
+            padding-left: 12px;
+        }
+        
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .notification-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .notification-badge {
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+        
+        .notification-badge.system {
+            background: #ecf5ff;
+            color: #409eff;
+        }
+        
+        .notification-badge.points {
+            background: #f0f9eb;
+            color: #67c23a;
+        }
+        
+        .notification-badge.promotion {
+            background: #fdf6ec;
+            color: #e6a23c;
+        }
+        
+        .notification-content {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        .notification-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .mark-all-read {
+            text-align: center;
+            color: #409eff;
+            font-size: 14px;
+            padding: 10px 0;
+            cursor: pointer;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+            color: #999;
+        }
+        
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .action-btn {
+            flex: 1;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #eee;
+            background: #f8f9fa;
+            color: #666;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .action-btn.primary {
+            background: #409eff;
+            color: white;
+            border-color: #409eff;
+        }
+        
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .nav-item.active {
+            color: #409eff;
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            z-index: 3000;
+            display: none;
+        }
+        
+        .toast.show {
+            display: block;
+        }
+        
+        .back-btn {
+            position: absolute;
+            left: 0;
+            top: 15px;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="back-btn" onclick="goBack()">←</span>
+            <h1 class="title">消息通知</h1>
+        </div>
+
+        <!-- 消息分类 -->
+        <div class="filter-tabs">
+            <div class="filter-tab active" data-type="all">全部</div>
+            <div class="filter-tab" data-type="system">系统</div>
+            <div class="filter-tab" data-type="points">积分</div>
+            <div class="filter-tab" data-type="promotion">活动</div>
+        </div>
+
+        <!-- 未读消息统计 -->
+        <div class="section">
+            <div class="section-title">
+                <span>消息中心</span>
+                <span class="unread-count" id="unreadCount">0</span>
+            </div>
+            <div class="mark-all-read" onclick="markAllAsRead()">全部标记为已读</div>
+        </div>
+
+        <!-- 消息列表 -->
+        <div class="section">
+            <div class="section-title">
+                <span>最新消息</span>
+            </div>
+            <div class="notification-list" id="notificationList">
+                <div class="empty-state">暂无消息</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="nav-bar">
+        <div class="nav-item" onclick="switchTab('home')">
+            <span class="nav-icon">🏠</span>
+            <span>首页</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('learning')">
+            <span class="nav-icon">📚</span>
+            <span>学习</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('points')">
+            <span class="nav-icon">💎</span>
+            <span>积分</span>
+        </div>
+        <div class="nav-item active" onclick="switchTab('profile')">
+            <span class="nav-icon">👤</span>
+            <span>我的</span>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = '/tingapi/api/v1';
+        let notifications = [];
+        let currentFilter = 'all';
+        
+        // 模拟通知数据
+        const mockNotifications = [
+            {
+                id: 1,
+                type: 'points',
+                title: '积分到账通知',
+                content: '您通过观看"JavaScript基础教程"获得150积分奖励，已存入您的积分账户。',
+                timestamp: '2026-04-03 15:30',
+                read: false,
+                related_id: 'session123'
+            },
+            {
+                id: 2,
+                type: 'system',
+                title: '系统公告',
+                content: 'Ting学习平台将于4月5日晚上22:00-24:00进行系统维护，期间可能短暂影响服务使用。',
+                timestamp: '2026-04-03 10:15',
+                read: false,
+                related_id: null
+            },
+            {
+                id: 3,
+                type: 'promotion',
+                title: '活动通知',
+                content: '每日签到活动火热进行中，连续签到7天可获得150积分奖励！',
+                timestamp: '2026-04-02 18:45',
+                read: true,
+                related_id: null
+            },
+            {
+                id: 4,
+                type: 'points',
+                title: '积分消费提醒',
+                content: '您使用500积分兑换了"精美笔记本"，商品将在3个工作日内发货。',
+                timestamp: '2026-04-02 14:20',
+                read: true,
+                related_id: 'exchange456'
+            },
+            {
+                id: 5,
+                type: 'system',
+                title: '安全提醒',
+                content: '您的账户于今天10:30在一台新设备上登录，如非本人操作请及时修改密码。',
+                timestamp: '2026-04-01 11:10',
+                read: true,
+                related_id: null
+            },
+            {
+                id: 6,
+                type: 'points',
+                title: '积分过期提醒',
+                content: '您账户中有100积分将于4月10日过期，请及时使用以免造成损失。',
+                timestamp: '2026-03-28 09:00',
+                read: true,
+                related_id: null
+            }
+        ];
+        
+        // 检查登录状态
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                showToast('请先登录');
+                setTimeout(() => {
+                    window.location.href = '/ting';
+                }, 1500);
+                return;
+            }
+            loadNotifications();
+        });
+        
+        // 加载通知
+        async function loadNotifications() {
+            // 在实际应用中，这里应该调用后端API获取通知数据
+            // const response = await fetch(`${API_BASE}/notifications/notifications/`, {
+            //     headers: {
+            //         'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+            //     }
+            // });
+            // if (response.ok) {
+            //     notifications = await response.json();
+            // } else {
+            //     notifications = mockNotifications;
+            // }
+            
+            notifications = mockNotifications;
+            renderNotifications();
+        }
+        
+        // 渲染通知
+        function renderNotifications() {
+            const listEl = document.getElementById('notificationList');
+            let filteredNotifications = notifications;
+            
+            if (currentFilter !== 'all') {
+                filteredNotifications = notifications.filter(n => n.type === currentFilter);
+            }
+            
+            if (filteredNotifications.length === 0) {
+                listEl.innerHTML = '<div class="empty-state">暂无消息</div>';
+                updateUnreadCount();
+                return;
+            }
+            
+            listEl.innerHTML = filteredNotifications.map(notification => `
+                <div class="notification-item ${!notification.read ? 'unread' : ''}" onclick="viewNotification(${notification.id})">
+                    <div class="notification-header">
+                        <div class="notification-title">${notification.title}</div>
+                        <div class="notification-badge ${notification.type}">${getNotificationTypeName(notification.type)}</div>
+                    </div>
+                    <div class="notification-content">${notification.content}</div>
+                    <div class="notification-meta">
+                        <span>${notification.timestamp}</span>
+                        ${!notification.read ? '<span style="color: #409eff;">未读</span>' : '<span style="color: #999;">已读</span>'}
+                    </div>
+                    <div class="notification-actions">
+                        <button class="action-btn" onclick="event.stopPropagation(); markAsRead(${notification.id})">标为已读</button>
+                        <button class="action-btn primary" onclick="event.stopPropagation(); takeAction(${notification.id})">查看详情</button>
+                    </div>
+                </div>
+            `).join('');
+            
+            updateUnreadCount();
+        }
+        
+        // 获取通知类型名称
+        function getNotificationTypeName(type) {
+            const names = {
+                system: '系统',
+                points: '积分',
+                promotion: '活动'
+            };
+            return names[type] || type;
+        }
+        
+        // 更新未读消息计数
+        function updateUnreadCount() {
+            const unreadCount = notifications.filter(n => !n.read).length;
+            document.getElementById('unreadCount').textContent = unreadCount > 0 ? unreadCount : '';
+        }
+        
+        // 查看通知
+        function viewNotification(id) {
+            const notification = notifications.find(n => n.id === id);
+            if (notification && !notification.read) {
+                markAsRead(id);
+            }
+        }
+        
+        // 标记为已读
+        function markAsRead(id) {
+            const notification = notifications.find(n => n.id === id);
+            if (notification) {
+                notification.read = true;
+                renderNotifications();
+                showToast('已标记为已读');
+            }
+        }
+        
+        // 全部标记为已读
+        function markAllAsRead() {
+            notifications.forEach(notification => {
+                notification.read = true;
+            });
+            renderNotifications();
+            showToast('全部标记为已读');
+        }
+        
+        // 执行操作
+        function takeAction(id) {
+            const notification = notifications.find(n => n.id === id);
+            if (notification) {
+                switch (notification.type) {
+                    case 'points':
+                        window.location.href = '/ting/points.html';
+                        break;
+                    case 'promotion':
+                        window.location.href = '/ting/mall.html';
+                        break;
+                    default:
+                        showToast('已查看通知详情');
+                }
+            }
+        }
+        
+        // 分类筛选
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                currentFilter = this.getAttribute('data-type');
+                renderNotifications();
+            });
+        });
+        
+        // 返回上一页
+        function goBack() {
+            window.history.back();
+        }
+        
+        // 切换底部导航
+        function switchTab(tab) {
+            if (tab === 'profile') return;
+            window.location.href = tab === 'home' ? '/ting' : `/ting/${tab}`;
+        }
+        
+        // Toast 提示
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
