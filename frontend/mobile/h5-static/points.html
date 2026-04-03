@@ -438,5 +438,40 @@
             }, 2000);
         }
     </script>
+    
+    <!-- 性能优化脚本 -->
+    <script>
+        // 图片懒加载初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            // 如果工具已加载则初始化，否则延迟加载
+            if (window.TingUtils && window.TingUtils.LazyLoader) {
+                new window.TingUtils.LazyLoader();
+            } else {
+                // 动态加载工具
+                const script = document.createElement('script');
+                script.src = './utils/lazy-load.js';
+                script.onload = () => {
+                    new window.TingUtils.LazyLoader();
+                };
+                document.head.appendChild(script);
+            }
+        });
+        
+        // 预加载常用资源
+        window.addEventListener('load', () => {
+            // 预加载商城和签到页面
+            const criticalResources = [
+                '/ting/mall.html',
+                '/ting/checkin.html'
+            ];
+            
+            criticalResources.forEach(url => {
+                const link = document.createElement('link');
+                link.rel = 'prefetch';
+                link.href = url;
+                document.head.appendChild(link);
+            });
+        });
+    </script>
 </body>
 </html>
