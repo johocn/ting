@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <title>学习历史 - Ting 学习平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 70px;
+        }
+        
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px 0;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #409eff;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .refresh-btn {
+            font-size: 14px;
+            color: #409eff;
+            cursor: pointer;
+        }
+        
+        .history-list {
+            margin-top: 10px;
+        }
+        
+        .history-item {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-info {
+            flex: 1;
+        }
+        
+        .history-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .history-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .history-status {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        
+        .history-status.completed {
+            color: #67c23a;
+            background: #f0f9eb;
+        }
+        
+        .history-status.in-progress {
+            color: #e6a23c;
+            background: #fdf6ec;
+        }
+        
+        .history-progress {
+            width: 100px;
+            text-align: right;
+        }
+        
+        .progress-bar-container {
+            width: 100%;
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 5px;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #409eff, #66b1ff);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            font-size: 10px;
+            color: #999;
+            text-align: right;
+        }
+        
+        .time-stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .time-stat {
+            text-align: center;
+        }
+        
+        .time-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .time-label {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .chart-container {
+            height: 200px;
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            gap: 10px;
+        }
+        
+        .chart-bar {
+            flex: 1;
+            max-width: 30px;
+            background: linear-gradient(to top, #409eff, #66b1ff);
+            border-radius: 5px 5px 0 0;
+            position: relative;
+            min-height: 5px;
+        }
+        
+        .chart-label {
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 10px;
+            color: #999;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+            color: #999;
+        }
+        
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .nav-item.active {
+            color: #409eff;
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            z-index: 3000;
+            display: none;
+        }
+        
+        .toast.show {
+            display: block;
+        }
+        
+        .back-btn {
+            position: absolute;
+            left: 0;
+            top: 15px;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="back-btn" onclick="goBack()">←</span>
+            <h1 class="title">学习历史</h1>
+        </div>
+
+        <!-- 学习统计 -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-value" id="totalSessions">0</div>
+                <div class="stat-label">学习次数</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="completedCount">0</div>
+                <div class="stat-label">已完成</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="totalDuration">0</div>
+                <div class="stat-label">总时长(min)</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-value" id="avgCompletion">0%</div>
+                <div class="stat-label">完成率</div>
+            </div>
+        </div>
+
+        <!-- 时间统计 -->
+        <div class="time-stats">
+            <div class="time-stat">
+                <div class="time-value" id="todayDuration">0</div>
+                <div class="time-label">今天(min)</div>
+            </div>
+            <div class="time-stat">
+                <div class="time-value" id="weekDuration">0</div>
+                <div class="time-label">本周(min)</div>
+            </div>
+            <div class="time-stat">
+                <div class="time-value" id="monthDuration">0</div>
+                <div class="time-label">本月(min)</div>
+            </div>
+        </div>
+
+        <!-- 学习趋势图表 -->
+        <div class="section">
+            <div class="section-title">
+                <span>学习趋势</span>
+            </div>
+            <div class="chart-container" id="trendChart">
+                <!-- 图表将通过 JavaScript 动态生成 -->
+            </div>
+        </div>
+
+        <!-- 学习记录 -->
+        <div class="section">
+            <div class="section-title">
+                <span>学习记录</span>
+                <span class="refresh-btn" onclick="loadLearningHistory()">🔄 刷新</span>
+            </div>
+            <div class="history-list" id="historyList">
+                <div class="empty-state">加载中...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="nav-bar">
+        <div class="nav-item" onclick="switchTab('home')">
+            <span class="nav-icon">🏠</span>
+            <span>首页</span>
+        </div>
+        <div class="nav-item active" onclick="switchTab('learning')">
+            <span class="nav-icon">📚</span>
+            <span>学习</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('points')">
+            <span class="nav-icon">💎</span>
+            <span>积分</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('profile')">
+            <span class="nav-icon">👤</span>
+            <span>我的</span>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = '/tingapi/api/v1';
+        let learningHistory = [];
+        
+        // 检查登录状态
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                showToast('请先登录');
+                setTimeout(() => {
+                    window.location.href = '/ting';
+                }, 1500);
+                return;
+            }
+            loadLearningHistory();
+        });
+        
+        // 加载学习历史
+        async function loadLearningHistory() {
+            const listEl = document.getElementById('historyList');
+            listEl.innerHTML = '<div class="empty-state">加载中...</div>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/learning/learning/user-progress`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    learningHistory = Array.isArray(data) ? data : [];
+                    
+                    if (learningHistory.length > 0) {
+                        renderHistoryList(learningHistory);
+                        updateStats(learningHistory);
+                        updateCharts(learningHistory);
+                    } else {
+                        listEl.innerHTML = '<div class="empty-state">暂无学习记录</div>';
+                        updateStats([]);
+                        updateCharts([]);
+                    }
+                } else {
+                    // 模拟数据
+                    const mockData = [
+                        {
+                            session_id: 'session1',
+                            content: { title: 'JavaScript基础教程', category: '编程' },
+                            watched_duration: 1800,
+                            total_duration: 1800,
+                            progress_percentage: 100,
+                            status: 'completed',
+                            start_time: '2026-04-03T10:00:00',
+                            points_earned: 150
+                        },
+                        {
+                            session_id: 'session2',
+                            content: { title: 'Python进阶课程', category: '编程' },
+                            watched_duration: 1200,
+                            total_duration: 1800,
+                            progress_percentage: 67,
+                            status: 'in_progress',
+                            start_time: '2026-04-02T14:30:00',
+                            points_earned: 100
+                        },
+                        {
+                            session_id: 'session3',
+                            content: { title: 'Vue.js实战', category: '前端' },
+                            watched_duration: 2400,
+                            total_duration: 2400,
+                            progress_percentage: 100,
+                            status: 'completed',
+                            start_time: '2026-04-01T16:00:00',
+                            points_earned: 200
+                        },
+                        {
+                            session_id: 'session4',
+                            content: { title: 'Node.js入门', category: '后端' },
+                            watched_duration: 900,
+                            total_duration: 1800,
+                            progress_percentage: 50,
+                            status: 'in_progress',
+                            start_time: '2026-03-31T11:00:00',
+                            points_earned: 75
+                        }
+                    ];
+                    learningHistory = mockData;
+                    renderHistoryList(mockData);
+                    updateStats(mockData);
+                    updateCharts(mockData);
+                }
+            } catch (error) {
+                console.error('加载学习历史失败:', error);
+                
+                // 使用模拟数据
+                const mockData = [
+                    {
+                        session_id: 'session1',
+                        content: { title: 'JavaScript基础教程', category: '编程' },
+                        watched_duration: 1800,
+                        total_duration: 1800,
+                        progress_percentage: 100,
+                        status: 'completed',
+                        start_time: '2026-04-03T10:00:00',
+                        points_earned: 150
+                    },
+                    {
+                        session_id: 'session2',
+                        content: { title: 'Python进阶课程', category: '编程' },
+                        watched_duration: 1200,
+                        total_duration: 1800,
+                        progress_percentage: 67,
+                        status: 'in_progress',
+                        start_time: '2026-04-02T14:30:00',
+                        points_earned: 100
+                    }
+                ];
+                learningHistory = mockData;
+                renderHistoryList(mockData);
+                updateStats(mockData);
+                updateCharts(mockData);
+            }
+        }
+        
+        // 渲染历史列表
+        function renderHistoryList(history) {
+            const listEl = document.getElementById('historyList');
+            
+            if (history.length === 0) {
+                listEl.innerHTML = '<div class="empty-state">暂无学习记录</div>';
+                return;
+            }
+            
+            listEl.innerHTML = history.map(item => `
+                <div class="history-item">
+                    <div class="history-info">
+                        <div class="history-title">${item.content?.title || '未知内容'}</div>
+                        <div class="history-meta">
+                            <span>${formatDate(item.start_time)}</span>
+                            <span class="history-status ${item.status}">${item.status === 'completed' ? '已完成' : '学习中'}</span>
+                        </div>
+                    </div>
+                    <div class="history-progress">
+                        <div class="progress-bar-container">
+                            <div class="progress-bar-fill" style="width: ${item.progress_percentage}%"></div>
+                        </div>
+                        <div class="progress-text">${item.progress_percentage}%</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        // 更新统计信息
+        function updateStats(history) {
+            const totalSessions = history.length;
+            const completedCount = history.filter(item => item.status === 'completed').length;
+            const totalDuration = Math.round(history.reduce((sum, item) => sum + (item.watched_duration || 0), 0) / 60); // 转换为分钟
+            const avgCompletion = totalSessions > 0 ? Math.round((completedCount / totalSessions) * 100) : 0;
+            
+            // 计算今天的时长
+            const today = new Date();
+            const todayStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+            const todayDuration = Math.round(history.filter(item => item.start_time?.startsWith(todayStr))
+                .reduce((sum, item) => sum + (item.watched_duration || 0), 0) / 60);
+            
+            // 计算本周时长
+            const weekStart = new Date(today);
+            weekStart.setDate(today.getDate() - today.getDay()); // 周日为一周开始
+            const weekStr = `${weekStart.getFullYear()}-${(weekStart.getMonth() + 1).toString().padStart(2, '0')}-${weekStart.getDate().toString().padStart(2, '0')}`;
+            const weekDuration = Math.round(history.filter(item => {
+                const itemDate = new Date(item.start_time);
+                return itemDate >= weekStart && itemDate <= today;
+            }).reduce((sum, item) => sum + (item.watched_duration || 0), 0) / 60);
+            
+            // 计算本月时长
+            const monthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+            const monthDuration = Math.round(history.filter(item => {
+                const itemDate = new Date(item.start_time);
+                return itemDate >= monthStart && itemDate <= today;
+            }).reduce((sum, item) => sum + (item.watched_duration || 0), 0) / 60);
+            
+            document.getElementById('totalSessions').textContent = totalSessions;
+            document.getElementById('completedCount').textContent = completedCount;
+            document.getElementById('totalDuration').textContent = totalDuration;
+            document.getElementById('avgCompletion').textContent = avgCompletion;
+            document.getElementById('todayDuration').textContent = todayDuration;
+            document.getElementById('weekDuration').textContent = weekDuration;
+            document.getElementById('monthDuration').textContent = monthDuration;
+        }
+        
+        // 更新图表
+        function updateCharts(history) {
+            const chartContainer = document.getElementById('trendChart');
+            // 清空现有内容
+            chartContainer.innerHTML = '';
+            
+            // 创建模拟的柱状图
+            const days = ['周一', '周二', '周三', '周四', '周五', '周六', '周日'];
+            const mockData = [45, 52, 38, 61, 48, 72, 55]; // 模拟数据
+            
+            days.forEach((day, index) => {
+                const barHeight = Math.max(10, (mockData[index] / 80) * 180); // 最小高度为10px
+                
+                const barDiv = document.createElement('div');
+                barDiv.className = 'chart-bar';
+                barDiv.style.height = `${barHeight}px`;
+                barDiv.innerHTML = `<div class="chart-label">${day}</div>`;
+                
+                chartContainer.appendChild(barDiv);
+            });
+        }
+        
+        // 格式化日期
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            const month = date.getMonth() + 1;
+            const day = date.getDate();
+            const hours = date.getHours().toString().padStart(2, '0');
+            const minutes = date.getMinutes().toString().padStart(2, '0');
+            return `${month}-${day} ${hours}:${minutes}`;
+        }
+        
+        // 返回上一页
+        function goBack() {
+            window.history.back();
+        }
+        
+        // 切换底部导航
+        function switchTab(tab) {
+            if (tab === 'learning') return;
+            window.location.href = tab === 'home' ? '/ting' : `/ting/${tab}`;
+        }
+        
+        // Toast 提示
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>

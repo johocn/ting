@@ -247,7 +247,7 @@
 
         <!-- 功能菜单 -->
         <div class="menu-section" style="display: none;" id="menuSection">
-            <div class="menu-item" onclick="showMessage('学习历史功能开发中')">
+            <div class="menu-item" onclick="goToLearningHistory()">
                 <span class="menu-icon">📜</span>
                 <span class="menu-text">学习历史</span>
                 <span class="arrow">›</span>
@@ -338,6 +338,11 @@
         // 显示关于
         function showAbout() {
             alert('Ting 学习平台 v1.0.0\n\n通过观看视频和音频学习内容，赚取积分，兑换奖励！\n\n© 2026 Ting Platform');
+        }
+        
+        // 前往学习历史
+        function goToLearningHistory() {
+            window.location.href = '/ting/history.html';
         }
         
         // 显示消息
