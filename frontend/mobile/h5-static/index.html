@@ -505,8 +505,7 @@
                 showLoginModal();
                 return;
             }
-            showToast(`开始学习：${title}`);
-            // TODO: 跳转到学习播放页面
+            window.location.href = `/ting/player.html?contentId=${contentId}`;
         }
         
         // 登录处理

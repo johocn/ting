@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <title>学习播放器 - Ting 学习平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: #000;
+            min-height: 100vh;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+            background: #000;
+        }
+        
+        .player-container {
+            position: relative;
+            width: 100%;
+            height: 70vh;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .video-placeholder {
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: #fff;
+        }
+        
+        .video-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: #fff;
+        }
+        
+        .play-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            border: 2px solid rgba(255,255,255,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+        
+        .play-icon {
+            width: 0;
+            height: 0;
+            border-top: 12px solid transparent;
+            border-left: 20px solid #fff;
+            border-bottom: 12px solid transparent;
+            margin-left: 4px;
+        }
+        
+        .controls-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            padding: 20px;
+            color: white;
+        }
+        
+        .progress-container {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            margin-bottom: 15px;
+            cursor: pointer;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: #409eff;
+            border-radius: 2px;
+            width: 0%;
+        }
+        
+        .time-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: rgba(255,255,255,0.8);
+        }
+        
+        .content-info {
+            background: white;
+            padding: 20px;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            margin-top: -20px;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .content-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .content-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            color: #999;
+            font-size: 14px;
+        }
+        
+        .content-category {
+            background: #ecf5ff;
+            color: #409eff;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        .content-points {
+            background: #f0f9eb;
+            color: #67c23a;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        .progress-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .progress-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .progress-label {
+            color: #666;
+        }
+        
+        .progress-value {
+            color: #333;
+            font-weight: 600;
+        }
+        
+        .progress-bar-container {
+            width: 100%;
+            height: 6px;
+            background: #e0e0e0;
+            border-radius: 3px;
+            overflow: hidden;
+            margin: 15px 0;
+        }
+        
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #409eff, #66b1ff);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        
+        .controls {
+            margin-top: 20px;
+        }
+        
+        .complete-btn {
+            width: 100%;
+            background: #409eff;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .complete-btn:disabled {
+            background: #c0c4cc;
+        }
+        
+        .tips {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        
+        .tip-text {
+            font-size: 12px;
+            color: #999;
+            display: block;
+        }
+        
+        .loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 16px;
+        }
+        
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            z-index: 3000;
+            display: none;
+        }
+        
+        .toast.show {
+            display: block;
+        }
+        
+        .video-player {
+            width: 100%;
+            height: 100%;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- 播放器容器 -->
+        <div class="player-container">
+            <div class="back-btn" onclick="goBack()">←</div>
+            
+            <!-- 视频占位符（模拟播放器） -->
+            <div class="video-placeholder" id="videoPlaceholder">
+                <div class="video-title" id="videoTitle">加载中...</div>
+                <div class="play-btn" id="playButton" onclick="startPlayback()">
+                    <div class="play-icon"></div>
+                </div>
+            </div>
+            
+            <!-- 视频播放器 -->
+            <video class="video-player" id="videoPlayer" controls></video>
+            
+            <!-- 控制层 -->
+            <div class="controls-overlay" id="controlsOverlay" style="display: none;">
+                <div class="progress-container" onclick="seekVideo(event)">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="time-info">
+                    <span id="currentTime">00:00</span>
+                    <span id="totalTime">00:00</span>
+                </div>
+            </div>
+            
+            <div class="loading" id="loadingIndicator" style="display: none;">加载中...</div>
+        </div>
+
+        <!-- 内容信息 -->
+        <div class="content-info">
+            <div class="content-title" id="contentTitle">内容标题</div>
+            <div class="content-meta">
+                <span class="content-category" id="contentCategory">分类</span>
+                <span class="content-points" id="contentPoints">积分: 0/分钟</span>
+            </div>
+            
+            <div class="progress-info">
+                <div class="progress-row">
+                    <span class="progress-label">已学习:</span>
+                    <span class="progress-value" id="watchedDuration">00:00</span>
+                </div>
+                <div class="progress-row">
+                    <span class="progress-label">总时长:</span>
+                    <span class="progress-value" id="totalDuration">00:00</span>
+                </div>
+                <div class="progress-row">
+                    <span class="progress-label">进度:</span>
+                    <span class="progress-value" id="progressPercentage">0%</span>
+                </div>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-bar-fill" id="progressFill"></div>
+                </div>
+            </div>
+
+            <div class="controls">
+                <button class="complete-btn" id="completeBtn" onclick="completeLearning()" disabled>
+                    完成学习
+                </button>
+            </div>
+
+            <div class="tips">
+                <span class="tip-text">💡 提示: 完成学习后将获得积分奖励</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = '/tingapi/api/v1';
+        let currentContent = null;
+        let currentSessionId = null;
+        let watchedDuration = 0;
+        let totalDuration = 0;
+        let isPlaying = false;
+        let progressInterval = null;
+        
+        // 页面加载
+        window.addEventListener('load', () => {
+            // 从 URL 参数获取内容 ID
+            const urlParams = new URLSearchParams(window.location.search);
+            const contentId = urlParams.get('contentId');
+            
+            if (!contentId) {
+                showToast('缺少内容 ID');
+                setTimeout(() => {
+                    window.location.href = '/ting';
+                }, 1500);
+                return;
+            }
+            
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                showToast('请先登录');
+                setTimeout(() => {
+                    window.location.href = '/ting';
+                }, 1500);
+                return;
+            }
+            
+            loadContentDetails(contentId);
+        });
+        
+        // 加载内容详情
+        async function loadContentDetails(contentId) {
+            try {
+                const response = await fetch(`${API_BASE}/contents/contents/${contentId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    currentContent = await response.json();
+                    document.getElementById('contentTitle').textContent = currentContent.title;
+                    document.getElementById('videoTitle').textContent = currentContent.title;
+                    document.getElementById('contentCategory').textContent = currentContent.category;
+                    document.getElementById('contentPoints').textContent = `积分: ${currentContent.reward_points_per_minute || 5}/分钟`;
+                    
+                    // 设置总时长
+                    totalDuration = currentContent.duration || 0;
+                    document.getElementById('totalDuration').textContent = formatDuration(totalDuration);
+                    document.getElementById('totalTime').textContent = formatDuration(totalDuration);
+                    
+                    // 检查是否已有学习会话
+                    checkExistingSession(contentId);
+                } else {
+                    showToast('获取内容详情失败');
+                    setTimeout(() => {
+                        window.location.href = '/ting';
+                    }, 1500);
+                }
+            } catch (error) {
+                console.error('加载内容详情失败:', error);
+                showToast('网络连接失败');
+            }
+        }
+        
+        // 检查现有学习会话
+        async function checkExistingSession(contentId) {
+            // 这里可以检查是否有未完成的学习会话
+            // 暂时先开始新的学习会话
+            await startNewSession(contentId);
+        }
+        
+        // 开始新的学习会话
+        async function startNewSession(contentId) {
+            try {
+                const response = await fetch(`${API_BASE}/learning/learning/start-learning`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    },
+                    body: JSON.stringify({ content_id: contentId })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    currentSessionId = data.session_id;
+                    showToast('学习会话已开始');
+                } else {
+                    showToast('开始学习失败');
+                }
+            } catch (error) {
+                console.error('开始学习会话失败:', error);
+                showToast('网络连接失败');
+            }
+        }
+        
+        // 开始播放
+        function startPlayback() {
+            if (!currentContent) {
+                showToast('内容尚未加载');
+                return;
+            }
+            
+            // 显示加载指示器
+            document.getElementById('loadingIndicator').style.display = 'block';
+            document.getElementById('playButton').style.display = 'none';
+            document.getElementById('videoPlaceholder').style.display = 'none';
+            
+            // 模拟加载视频
+            setTimeout(() => {
+                document.getElementById('loadingIndicator').style.display = 'none';
+                document.getElementById('controlsOverlay').style.display = 'block';
+                
+                // 显示视频播放器（这里只是模拟）
+                const videoPlayer = document.getElementById('videoPlayer');
+                videoPlayer.style.display = 'block';
+                
+                // 模拟播放
+                isPlaying = true;
+                startProgressTracking();
+                
+                // 启动定时更新进度
+                startProgressUpdates();
+            }, 1500);
+        }
+        
+        // 开始进度跟踪
+        function startProgressTracking() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+            
+            progressInterval = setInterval(() => {
+                if (isPlaying) {
+                    watchedDuration += 1;
+                    
+                    // 更新进度显示
+                    updateProgressDisplay();
+                    
+                    // 检查是否完成
+                    if (watchedDuration >= totalDuration) {
+                        completeLearning();
+                    }
+                }
+            }, 1000);
+        }
+        
+        // 开始进度更新
+        function startProgressUpdates() {
+            // 每10秒更新一次学习进度到服务器
+            setInterval(async () => {
+                if (currentSessionId && watchedDuration > 0) {
+                    await updateLearningProgress();
+                }
+            }, 10000);
+        }
+        
+        // 更新学习进度到服务器
+        async function updateLearningProgress() {
+            if (!currentSessionId || watchedDuration <= 0) return;
+            
+            try {
+                await fetch(`${API_BASE}/learning/learning/update-progress`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    },
+                    body: JSON.stringify({
+                        session_id: currentSessionId,
+                        watched_duration: watchedDuration
+                    })
+                });
+            } catch (error) {
+                console.error('更新学习进度失败:', error);
+            }
+        }
+        
+        // 更新进度显示
+        function updateProgressDisplay() {
+            const percentage = totalDuration > 0 ? Math.floor((watchedDuration / totalDuration) * 100) : 0;
+            
+            document.getElementById('watchedDuration').textContent = formatDuration(watchedDuration);
+            document.getElementById('progressPercentage').textContent = `${percentage}%`;
+            document.getElementById('progressFill').style.width = `${percentage}%`;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+            document.getElementById('currentTime').textContent = formatDuration(watchedDuration);
+            
+            // 如果进度达到100%，启用完成按钮
+            if (percentage >= 100) {
+                document.getElementById('completeBtn').disabled = false;
+                document.getElementById('completeBtn').textContent = '完成学习';
+            }
+        }
+        
+        // 完成学习
+        async function completeLearning() {
+            if (!currentSessionId) {
+                showToast('无效的学习会话');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/learning/learning/complete-learning`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    },
+                    body: JSON.stringify({
+                        session_id: currentSessionId
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showToast(`学习完成！获得 ${data.points_earned || 0} 积分`);
+                    
+                    // 更新用户积分
+                    updateUserPoints(data.points_earned);
+                    
+                    // 返回学习中心
+                    setTimeout(() => {
+                        window.location.href = '/ting';
+                    }, 2000);
+                } else {
+                    showToast('完成学习失败');
+                }
+            } catch (error) {
+                console.error('完成学习失败:', error);
+                showToast('网络连接失败');
+            }
+        }
+        
+        // 更新用户积分
+        function updateUserPoints(pointsEarned) {
+            try {
+                const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+                userInfo.integral = (userInfo.integral || 0) + pointsEarned;
+                localStorage.setItem('user_info', JSON.stringify(userInfo));
+            } catch (e) {
+                console.error('更新用户积分失败:', e);
+            }
+        }
+        
+        // 格式化时长
+        function formatDuration(seconds) {
+            if (!seconds) return '00:00';
+            const mins = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+        
+        // 跳转到指定时间
+        function seekVideo(event) {
+            if (!totalDuration) return;
+            
+            const rect = event.target.getBoundingClientRect();
+            const pos = (event.clientX - rect.left) / rect.width;
+            const newTime = Math.floor(pos * totalDuration);
+            
+            // 更新观看时长
+            watchedDuration = newTime;
+            updateProgressDisplay();
+        }
+        
+        // 返回上一页
+        function goBack() {
+            window.history.back();
+        }
+        
+        // Toast 提示
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+        
+        // 页面卸载时保存进度
+        window.addEventListener('beforeunload', async () => {
+            if (currentSessionId && watchedDuration > 0) {
+                await updateLearningProgress();
+            }
+        });
+    </script>
+</body>
+</html>
