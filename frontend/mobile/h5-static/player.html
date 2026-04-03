@@ -425,13 +425,12 @@
         // 开始新的学习会话
         async function startNewSession(contentId) {
             try {
-                const response = await fetch(`${API_BASE}/learning/learning/start-learning`, {
+                // content_id 需要作为 query 参数传递
+                const response = await fetch(`${API_BASE}/learning/learning/start-learning?content_id=${contentId}`, {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
                         'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-                    },
-                    body: JSON.stringify({ content_id: contentId })
+                    }
                 });
                 
                 if (response.ok) {
@@ -439,7 +438,8 @@
                     currentSessionId = data.session_id;
                     showToast('学习会话已开始');
                 } else {
-                    showToast('开始学习失败');
+                    const errorData = await response.json();
+                    showToast('开始学习失败：' + (errorData.detail || ''));
                 }
             } catch (error) {
                 console.error('开始学习会话失败:', error);
@@ -650,7 +650,7 @@
             } else {
                 // 动态加载工具
                 const script = document.createElement('script');
-                script.src = './utils/lazy-load.js';
+                script.src = '/ting/utils/lazy-load.js?v=20260403';
                 script.onload = () => {
                     new window.TingUtils.LazyLoader();
                 };

@@ -7,8 +7,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="format-detection" content="telephone=no">
     <title>Ting 学习平台</title>
-    <script src="./utils/lazy-load.js"></script>
-    <script src="./utils/ux-enhancements.js"></script>
+    <script src="/ting/utils/lazy-load.js?v=20260403"></script>
+    <script src="/ting/utils/ux-enhancements.js?v=20260403"></script>
     <style>
         * {
             margin: 0;
@@ -698,7 +698,7 @@
             } else {
                 // 动态加载工具
                 const script = document.createElement('script');
-                script.src = './utils/lazy-load.js';
+                script.src = '/ting/utils/lazy-load.js?v=20260403';
                 script.onload = () => {
                     new window.TingUtils.LazyLoader();
                 };

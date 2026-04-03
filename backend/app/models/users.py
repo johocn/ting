@@ -1,4 +1,5 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy.orm import relationship
 from datetime import datetime
 from app.database import Base
 
@@ -16,3 +17,7 @@ class User(Base):
     is_member = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    
+    # 关联行为统计
+    behaviors = relationship("UserBehavior", back_populates="user")
+    engagement = relationship("UserEngagement", back_populates="user", uselist=False)

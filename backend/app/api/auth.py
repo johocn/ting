@@ -34,9 +34,9 @@ async def register(user_data: UserCreate, db: Session = Depends(get_db)):
     token = create_access_token(data={"sub": str(new_user.id)})
     
     return {
-        "user_id": new_user.id,
-        "username": new_user.username,
-        "token": token
+        "user_id": int(new_user.id),
+        "username": str(new_user.username),
+        "token": str(token)
     }
 
 @router.post("/login")
@@ -55,9 +55,9 @@ async def login(user_data: UserLogin, db: Session = Depends(get_db)):
     token = create_access_token(data={"sub": str(user.id)})
     
     return {
-        "user_id": user.id,
-        "username": user.username,
-        "token": token
+        "user_id": int(user.id),
+        "username": str(user.username),
+        "token": str(token)
     }
 
 def create_access_token(data: dict):

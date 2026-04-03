@@ -15,8 +15,19 @@ async def get_contents(
 ):
     """获取内容列表"""
     contents = db.query(Content).offset(skip).limit(limit).all()
-    # 将模型对象转换为字典
-    return [content.__dict__ for content in contents if content.__dict__.get('_sa_instance_state') is not None]
+    # 将模型对象转换为字典，排除 SQLAlchemy 内部属性
+    result = []
+    for content in contents:
+        content_dict = {}
+        for column in content.__table__.columns:
+            value = getattr(content, column.name)
+            # 将特殊类型转换为基本类型
+            if hasattr(value, 'isoformat'):  # datetime 对象
+                content_dict[column.name] = value.isoformat()
+            else:
+                content_dict[column.name] = value
+        result.append(content_dict)
+    return result
 
 @router.get("/{content_id}", response_model=dict)
 async def get_content(content_id: int, db: Session = Depends(get_db)):

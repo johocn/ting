@@ -29,7 +29,17 @@ async def get_products(
         query = query.filter(Product.category_id == category_id)
     
     products = query.offset(skip).limit(limit).all()
-    return products
+    result = []
+    for product in products:
+        product_dict = {}
+        for column in product.__table__.columns:
+            value = getattr(product, column.name)
+            if hasattr(value, 'isoformat'):
+                product_dict[column.name] = value.isoformat()
+            else:
+                product_dict[column.name] = value
+        result.append(product_dict)
+    return result
 
 @router.get("/{product_id}", response_model=dict)
 async def get_product(product_id: int, db: Session = Depends(get_db)):

@@ -1,7 +1,7 @@
 from fastapi import APIRouter
-from app.api import auth, users, contents, quizzes, points, channels, hierarchy, verification, learning_progress
+from app.api import auth, users, contents, quizzes, points, channels, hierarchy, verification, learning_progress, mall
 from app.api.sign_notifications import sign_notifications_router
-from app.api.analytics import router as analytics_router
+from app.api.analytics import analytics_router
 
 router = APIRouter()
 
@@ -17,3 +17,4 @@ router.include_router(verification.router, prefix="/verification", tags=["verifi
 router.include_router(learning_progress.router, prefix="/learning", tags=["learning"])
 router.include_router(sign_notifications_router, prefix="/sign", tags=["sign"])
 router.include_router(analytics_router, prefix="/analytics", tags=["analytics"])
+router.include_router(mall.router, prefix="/mall", tags=["mall"])

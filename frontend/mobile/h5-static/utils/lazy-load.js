@@ -161,12 +161,15 @@ document.addEventListener('DOMContentLoaded', () => {
     new LazyLoader();
 });
 
-// 导出工具
+// 导出到全局 window（兼容普通脚本加载）
+window.LazyLoader = LazyLoader;
+window.CodeSplitter = CodeSplitter;
+window.debounce = debounce;
+window.throttle = throttle;
+
 window.TingUtils = {
     LazyLoader,
     CodeSplitter,
     debounce,
     throttle
 };
-
-export { LazyLoader, CodeSplitter, debounce, throttle };

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, Security
 from sqlalchemy.orm import Session
+from sqlalchemy import text
 from typing import List, Optional
 from datetime import datetime, date
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
@@ -8,6 +9,7 @@ import hashlib
 
 from app.database import get_db
 from app.models import User, SignRecord, Notification
+from app.models.analytics import UserEngagement
 from app.core.config import settings
 from app.schemas.sign_notifications import (
     SignRecordResponse, 
@@ -97,17 +99,26 @@ async def sign_today(
     db.refresh(sign_record)
     
     # 更新用户积分账户
-    user_account = db.query(User).filter(User.id == current_user.id).first()
-    if not user_account.point_account:
-        from app.models.points import UserPointAccount
-        account = UserPointAccount(user_id=current_user.id)
-        db.add(account)
+    from app.models.points import UserPointAccount
+    point_account = db.query(UserPointAccount).filter(UserPointAccount.user_id == current_user.id).first()
+    if not point_account:
+        point_account = UserPointAccount(user_id=current_user.id)
+        db.add(point_account)
         db.commit()
-        db.refresh(account)
-        user_account.point_account = account
+        db.refresh(point_account)
     
-    user_account.point_account.total_points += total_points
-    user_account.point_account.available_points += total_points
+    point_account.total_points += total_points
+    point_account.available_points += total_points
+    db.commit()
+    
+    # 更新用户参与度
+    engagement = db.query(UserEngagement).filter(UserEngagement.user_id == current_user.id).first()
+    if not engagement:
+        engagement = UserEngagement(user_id=current_user.id)
+        db.add(engagement)
+    
+    engagement.sign_ins = (engagement.sign_ins or 0) + 1
+    engagement.last_activity_at = datetime.utcnow()
     db.commit()
     
     # 创建签到奖励通知
@@ -174,9 +185,9 @@ async def get_sign_info(
     ).count()
     
     # 获取最长连续签到
-    longest_streak_result = db.execute("""
+    longest_streak_result = db.execute(text("""
         SELECT MAX(continuous_days) FROM sign_records WHERE user_id = :user_id
-    """, {"user_id": current_user.id}).fetchone()
+    """), {"user_id": current_user.id}).fetchone()
     longest_streak = longest_streak_result[0] or 0
     
     return {

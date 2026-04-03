@@ -386,15 +386,28 @@ class RequestWrapper {
     }
 }
 
-// 初始化全局实例
-const tingUX = {
-    loading: new LoadingManager(),
-    error: ErrorHandler,
-    offline: new OfflineManager(),
-    request: new RequestWrapper()
-};
+// 延迟初始化，确保 DOM 已加载
+function initTingUX() {
+    const tingUX = {
+        loading: new LoadingManager(),
+        error: ErrorHandler,
+        offline: new OfflineManager(),
+        request: new RequestWrapper()
+    };
+    
+    // 导出到全局
+    window.TingUX = tingUX;
+    console.log('TingUX 初始化完成');
+}
 
-// 导出到全局
-window.TingUX = tingUX;
+// DOM 加载完成后初始化
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTingUX);
+} else {
+    initTingUX();
+}
 
-export { LoadingManager, ErrorHandler, OfflineManager, RequestWrapper, tingUX };
+// 同时支持 ES6 模块和普通脚本
+if (typeof module !== 'undefined' && module.exports) {
+    module.exports = { LoadingManager, ErrorHandler, OfflineManager, RequestWrapper };
+}
