@@ -27,14 +27,15 @@ services:
     networks:
       - ting_network
 
-  # 后端服务
+  # 后端服务 (仅内部访问，不开放外部端口)
   backend:
     build:
       context: .
       dockerfile: backend/Dockerfile
     container_name: ting_backend
-    ports:
-      - "8100:8000"
+    # 不开放外部端口，仅通过 nginx 反向代理访问
+    # ports:
+    #   - "8100:8000"  # 开发调试时可临时开启
     environment:
       - DATABASE_URL=postgresql://ting_user:ting_password@postgres:5432/ting_db
       - REDIS_URL=redis://redis:6379
