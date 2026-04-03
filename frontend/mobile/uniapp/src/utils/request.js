@@ -1,5 +1,7 @@
 // uni-app 请求封装
-const BASE_URL = 'http://localhost:8000';
+// 生产环境使用 nginx 代理地址，开发环境可使用本地地址
+const BASE_URL = 'http://www.joyogo.com/tingapi';
+// 开发环境可切换为：const BASE_URL = 'http://localhost:8000';
 
 class Request {
   constructor(baseURL = '') {

@@ -37,21 +37,15 @@
         <text class="arrow">›</text>
       </view>
       
-      <view class="menu-item" @click="goToSecurity">
-        <text class="menu-icon">🔒</text>
-        <text class="menu-text">安全设置</text>
-        <text class="arrow">›</text>
-      </view>
-      
       <view class="menu-item" @click="goToHistory">
         <text class="menu-icon">📜</text>
         <text class="menu-text">学习历史</text>
         <text class="arrow">›</text>
       </view>
       
-      <view class="menu-item" @click="goToSettings">
-        <text class="menu-icon">⚙️</text>
-        <text class="menu-text">设置</text>
+      <view class="menu-item" @click="goToAbout">
+        <text class="menu-icon">ℹ️</text>
+        <text class="menu-text">关于我们</text>
         <text class="arrow">›</text>
       </view>
     </view>
@@ -105,21 +99,17 @@ export default {
       });
     };
 
-    const goToSecurity = () => {
-      uni.navigateTo({
-        url: '/pages/security/security'
-      });
-    };
-
     const goToHistory = () => {
       uni.navigateTo({
         url: '/pages/history/history'
       });
     };
 
-    const goToSettings = () => {
-      uni.navigateTo({
-        url: '/pages/settings/settings'
+    const goToAbout = () => {
+      uni.showModal({
+        title: '关于 Ting',
+        content: 'Ting 学习平台 v1.0.0\n\n通过观看视频和音频学习内容，赚取积分，兑换奖励！',
+        showCancel: false
       });
     };
 

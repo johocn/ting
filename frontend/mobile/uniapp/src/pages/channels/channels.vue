@@ -100,8 +100,10 @@ export default {
 
     // 创建新渠道
     const createChannel = () => {
-      uni.navigateTo({
-        url: '/pages/channel-create/channel-create'
+      uni.showModal({
+        title: '创建渠道',
+        content: '渠道创建功能开发中，敬请期待！',
+        showCancel: false
       });
     };
 
