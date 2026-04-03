@@ -258,6 +258,15 @@
         <!-- 积分流水 -->
         <div class="section">
             <div class="section-title">
+                <span>积分商城</span>
+            </div>
+            <div style="text-align: center; padding: 20px 0;">
+                <button class="refresh-btn" onclick="goToMall()" style="padding: 12px 24px; background: #409eff; color: white; border: none; border-radius: 8px; font-size: 16px; cursor: pointer;">前往积分商城</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">
                 <span>积分流水</span>
                 <span class="refresh-btn" onclick="loadTransactions()">🔄 刷新</span>
             </div>
@@ -400,6 +409,11 @@
         // 返回上一页
         function goBack() {
             window.history.back();
+        }
+        
+        // 前往积分商城
+        function goToMall() {
+            window.location.href = '/ting/mall.html';
         }
         
         // 切换底部导航

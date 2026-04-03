@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="format-detection" content="telephone=no">
+    <title>积分商城 - Ting 学习平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            padding-bottom: 70px;
+        }
+        
+        .container {
+            max-width: 750px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px 0;
+        }
+        
+        .title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+        
+        .points-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+        
+        .points-label {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 10px;
+        }
+        
+        .points-total {
+            font-size: 48px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .points-info {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+        
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .section-subtitle {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .filter-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 5px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        
+        .filter-tab.active {
+            background: #409eff;
+            color: white;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .product-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .product-card:active {
+            transform: scale(0.96);
+        }
+        
+        .product-card:hover {
+            box-shadow: 0 6px 16px rgba(0,0,0,0.1);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 120px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+        
+        .product-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .product-points {
+            font-size: 16px;
+            font-weight: bold;
+            color: #e6a23c;
+            margin-bottom: 5px;
+        }
+        
+        .product-stock {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .exchange-btn {
+            background: #e6a23c;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .exchange-btn.disabled {
+            background: #c0c4cc;
+        }
+        
+        .exchange-btn.enough {
+            background: #67c23a;
+        }
+        
+        .product-detail {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            display: none;
+        }
+        
+        .product-detail.show {
+            display: block;
+        }
+        
+        .detail-image {
+            width: 100%;
+            height: 200px;
+            background: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+        }
+        
+        .detail-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .detail-description {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+        
+        .detail-points {
+            font-size: 24px;
+            font-weight: bold;
+            color: #e6a23c;
+            text-align: center;
+            margin-bottom: 15px;
+        }
+        
+        .detail-stock {
+            font-size: 14px;
+            color: #999;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        
+        .quantity-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #f0f0f0;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+        }
+        
+        .quantity-input {
+            width: 60px;
+            height: 36px;
+            text-align: center;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin: 0 10px;
+            font-size: 16px;
+        }
+        
+        .confirm-exchange-btn {
+            background: #e6a23c;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .confirm-exchange-btn.enough {
+            background: #67c23a;
+        }
+        
+        .confirm-exchange-btn.disabled {
+            background: #c0c4cc;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+            color: #999;
+        }
+        
+        .nav-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            text-align: center;
+            color: #999;
+            font-size: 12px;
+            cursor: pointer;
+            flex: 1;
+        }
+        
+        .nav-item.active {
+            color: #409eff;
+        }
+        
+        .nav-icon {
+            font-size: 24px;
+            display: block;
+            margin-bottom: 4px;
+        }
+        
+        .toast {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            z-index: 3000;
+            display: none;
+        }
+        
+        .toast.show {
+            display: block;
+        }
+        
+        .back-btn {
+            position: absolute;
+            left: 0;
+            top: 15px;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+        }
+        
+        .exchange-history {
+            margin-top: 20px;
+        }
+        
+        .history-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .history-item:last-child {
+            border-bottom: none;
+        }
+        
+        .history-info {
+            flex: 1;
+        }
+        
+        .history-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
+        }
+        
+        .history-time {
+            font-size: 12px;
+            color: #999;
+        }
+        
+        .history-points {
+            font-size: 14px;
+            color: #f56c6c;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="back-btn" onclick="goBack()">←</span>
+            <h1 class="title">积分商城</h1>
+        </div>
+
+        <!-- 积分卡片 -->
+        <div class="points-card">
+            <div class="points-label">我的积分</div>
+            <div class="points-total" id="totalPoints">0</div>
+            <div class="points-info">可用于兑换商品</div>
+        </div>
+
+        <!-- 商品分类 -->
+        <div class="section">
+            <div class="section-title">
+                <span>商品分类</span>
+            </div>
+            <div class="filter-tabs">
+                <div class="filter-tab active" data-category="all">全部</div>
+                <div class="filter-tab" data-category="physical">实物商品</div>
+                <div class="filter-tab" data-category="virtual">虚拟商品</div>
+                <div class="filter-tab" data-category="voucher">优惠券</div>
+            </div>
+        </div>
+
+        <!-- 商品列表 -->
+        <div class="section">
+            <div class="section-title">
+                <span>热门商品</span>
+            </div>
+            <div class="products-grid" id="productsGrid">
+                <div class="empty-state">加载中...</div>
+            </div>
+        </div>
+
+        <!-- 商品详情 -->
+        <div class="product-detail" id="productDetail">
+            <div class="detail-image" id="detailImage">🎁</div>
+            <div class="detail-name" id="detailName">商品名称</div>
+            <div class="detail-description" id="detailDescription">商品描述</div>
+            <div class="detail-points" id="detailPoints">0 积分</div>
+            <div class="detail-stock" id="detailStock">库存: 0</div>
+            
+            <div class="quantity-selector">
+                <button class="quantity-btn" onclick="decreaseQuantity()">-</button>
+                <input type="number" class="quantity-input" id="quantityInput" value="1" min="1" max="99">
+                <button class="quantity-btn" onclick="increaseQuantity()">+</button>
+            </div>
+            
+            <button class="confirm-exchange-btn" id="exchangeBtn" onclick="confirmExchange()">
+                兑换商品
+            </button>
+        </div>
+
+        <!-- 兑换历史 -->
+        <div class="section exchange-history">
+            <div class="section-title">
+                <span>兑换历史</span>
+            </div>
+            <div id="exchangeHistory">
+                <div class="empty-state">暂无兑换记录</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部导航 -->
+    <div class="nav-bar">
+        <div class="nav-item" onclick="switchTab('home')">
+            <span class="nav-icon">🏠</span>
+            <span>首页</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('learning')">
+            <span class="nav-icon">📚</span>
+            <span>学习</span>
+        </div>
+        <div class="nav-item active" onclick="switchTab('points')">
+            <span class="nav-icon">💎</span>
+            <span>积分</span>
+        </div>
+        <div class="nav-item" onclick="switchTab('profile')">
+            <span class="nav-icon">👤</span>
+            <span>我的</span>
+        </div>
+    </div>
+
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        const API_BASE = '/tingapi/api/v1';
+        let currentUser = null;
+        let products = [];
+        let currentProduct = null;
+        let currentQuantity = 1;
+        
+        // 检查登录状态
+        window.addEventListener('load', () => {
+            const token = localStorage.getItem('access_token');
+            const userInfo = localStorage.getItem('user_info');
+            
+            if (token && userInfo) {
+                currentUser = JSON.parse(userInfo);
+                loadUserData();
+                loadProducts();
+                loadExchangeHistory();
+            } else {
+                showToast('请先登录');
+                setTimeout(() => {
+                    window.location.href = '/ting';
+                }, 1500);
+            }
+        });
+        
+        // 加载用户数据
+        async function loadUserData() {
+            try {
+                const response = await fetch(`${API_BASE}/points/points/account`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('totalPoints').textContent = data.total_points || 0;
+                    currentUser.integral = data.total_points || 0;
+                } else {
+                    showToast('获取积分信息失败');
+                }
+            } catch (error) {
+                console.error('加载用户数据失败:', error);
+            }
+        }
+        
+        // 加载商品列表
+        async function loadProducts() {
+            try {
+                const response = await fetch(`${API_BASE}/products/products/`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    products = Array.isArray(data) ? data : [];
+                    renderProducts(products);
+                } else {
+                    // 模拟商品数据
+                    products = [
+                        { id: 1, name: '精美笔记本', description: '高品质笔记本，适合学习记录', points_required: 500, stock_quantity: 100, category_id: 1, is_virtual: false },
+                        { id: 2, name: '学习视频会员', description: '一个月学习视频会员', points_required: 800, stock_quantity: 500, category_id: 2, is_virtual: true },
+                        { id: 3, name: 'T恤衫', description: '舒适棉质T恤，多种颜色可选', points_required: 1200, stock_quantity: 30, category_id: 1, is_virtual: false },
+                        { id: 4, name: '积分翻倍卡', description: '使用后下次学习积分翻倍', points_required: 300, stock_quantity: 200, category_id: 3, is_virtual: true },
+                        { id: 5, name: '优惠券', description: '10元现金优惠券', points_required: 1000, stock_quantity: 80, category_id: 4, is_virtual: false },
+                        { id: 6, name: '精美水杯', description: '保温水杯，陪伴你的学习时光', points_required: 600, stock_quantity: 60, category_id: 1, is_virtual: false }
+                    ];
+                    renderProducts(products);
+                }
+            } catch (error) {
+                console.error('加载商品列表失败:', error);
+                // 模拟商品数据
+                products = [
+                    { id: 1, name: '精美笔记本', description: '高品质笔记本，适合学习记录', points_required: 500, stock_quantity: 100, category_id: 1, is_virtual: false },
+                    { id: 2, name: '学习视频会员', description: '一个月学习视频会员', points_required: 800, stock_quantity: 500, category_id: 2, is_virtual: true },
+                    { id: 3, name: 'T恤衫', description: '舒适棉质T恤，多种颜色可选', points_required: 1200, stock_quantity: 30, category_id: 1, is_virtual: false },
+                    { id: 4, name: '积分翻倍卡', description: '使用后下次学习积分翻倍', points_required: 300, stock_quantity: 200, category_id: 3, is_virtual: true },
+                    { id: 5, name: '优惠券', description: '10元现金优惠券', points_required: 1000, stock_quantity: 80, category_id: 4, is_virtual: false },
+                    { id: 6, name: '精美水杯', description: '保温水杯，陪伴你的学习时光', points_required: 600, stock_quantity: 60, category_id: 1, is_virtual: false }
+                ];
+                renderProducts(products);
+            }
+        }
+        
+        // 渲染商品列表
+        function renderProducts(productsToShow) {
+            const grid = document.getElementById('productsGrid');
+            
+            if (productsToShow.length === 0) {
+                grid.innerHTML = '<div class="empty-state">暂无商品</div>';
+                return;
+            }
+            
+            grid.innerHTML = productsToShow.map(product => {
+                const canAfford = currentUser.integral >= product.points_required;
+                return `
+                    <div class="product-card" onclick="showProductDetail(${product.id})">
+                        <div class="product-image">${getProductEmoji(product.category_id)}</div>
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-points">${product.points_required} 积分</div>
+                        <div class="product-stock">库存: ${product.stock_quantity}</div>
+                        <button class="exchange-btn ${canAfford ? 'enough' : 'disabled'}" 
+                                onclick="event.stopPropagation(); exchangeProduct(${product.id})">
+                            ${canAfford ? '兑换' : '积分不足'}
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // 获取商品图标
+        function getProductEmoji(categoryId) {
+            const emojis = {
+                1: '🎁', // 实物
+                2: '🎬', // 虚拟
+                3: '🃏', // 道具
+                4: '💰', // 优惠券
+            };
+            return emojis[categoryId] || '🛍️';
+        }
+        
+        // 显示商品详情
+        function showProductDetail(productId) {
+            currentProduct = products.find(p => p.id === productId);
+            if (!currentProduct) return;
+            
+            document.getElementById('detailImage').textContent = getProductEmoji(currentProduct.category_id);
+            document.getElementById('detailName').textContent = currentProduct.name;
+            document.getElementById('detailDescription').textContent = currentProduct.description;
+            document.getElementById('detailPoints').textContent = `${currentProduct.points_required} 积分`;
+            document.getElementById('detailStock').textContent = `库存: ${currentProduct.stock_quantity}`;
+            document.getElementById('quantityInput').value = 1;
+            currentQuantity = 1;
+            
+            updateExchangeButton();
+            
+            document.getElementById('productDetail').classList.add('show');
+            document.querySelector('.section:nth-child(3)').style.display = 'none';
+            document.querySelector('.exchange-history').style.display = 'none';
+            
+            // 滚动到顶部
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        
+        // 隐藏商品详情
+        function hideProductDetail() {
+            document.getElementById('productDetail').classList.remove('show');
+            document.querySelector('.section:nth-child(3)').style.display = 'block';
+            document.querySelector('.exchange-history').style.display = 'block';
+        }
+        
+        // 增加数量
+        function increaseQuantity() {
+            const maxQty = Math.min(currentProduct.stock_quantity, Math.floor(currentUser.integral / currentProduct.points_required));
+            if (currentQuantity < maxQty) {
+                currentQuantity++;
+                document.getElementById('quantityInput').value = currentQuantity;
+                updateExchangeButton();
+            }
+        }
+        
+        // 减少数量
+        function decreaseQuantity() {
+            if (currentQuantity > 1) {
+                currentQuantity--;
+                document.getElementById('quantityInput').value = currentQuantity;
+                updateExchangeButton();
+            }
+        }
+        
+        // 更新兑换按钮状态
+        function updateExchangeButton() {
+            const totalPointsNeeded = currentProduct.points_required * currentQuantity;
+            const canAfford = currentUser.integral >= totalPointsNeeded;
+            const btn = document.getElementById('exchangeBtn');
+            
+            btn.textContent = canAfford ? `兑换 (${totalPointsNeeded} 积分)` : '积分不足';
+            btn.className = 'confirm-exchange-btn ' + (canAfford ? 'enough' : 'disabled');
+        }
+        
+        // 兑换商品
+        async function exchangeProduct(productId, quantity = 1) {
+            if (!productId) {
+                currentProduct = products.find(p => p.id === productId);
+            }
+            
+            const totalPointsNeeded = currentProduct.points_required * quantity;
+            if (currentUser.integral < totalPointsNeeded) {
+                showToast('积分不足');
+                return;
+            }
+            
+            if (currentProduct.stock_quantity < quantity) {
+                showToast('库存不足');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE}/products/products/${productId}/exchange`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    },
+                    body: JSON.stringify({ quantity: quantity })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    showToast(`兑换成功！消耗 ${totalPointsNeeded} 积分`);
+                    
+                    // 更新用户积分
+                    currentUser.integral -= totalPointsNeeded;
+                    document.getElementById('totalPoints').textContent = currentUser.integral;
+                    
+                    // 刷新商品列表
+                    loadProducts();
+                } else {
+                    const error = await response.json();
+                    showToast(error.detail || '兑换失败');
+                }
+            } catch (error) {
+                console.error('兑换商品失败:', error);
+                showToast('网络连接失败');
+            }
+        }
+        
+        // 确认兑换
+        function confirmExchange() {
+            if (!currentProduct) {
+                showToast('请选择商品');
+                return;
+            }
+            
+            const quantity = parseInt(document.getElementById('quantityInput').value);
+            if (isNaN(quantity) || quantity < 1) {
+                showToast('请输入正确的数量');
+                return;
+            }
+            
+            const totalPointsNeeded = currentProduct.points_required * quantity;
+            if (currentUser.integral < totalPointsNeeded) {
+                showToast('积分不足');
+                return;
+            }
+            
+            if (currentProduct.stock_quantity < quantity) {
+                showToast('库存不足');
+                return;
+            }
+            
+            exchangeProduct(currentProduct.id, quantity);
+        }
+        
+        // 加载兑换历史
+        async function loadExchangeHistory() {
+            // 暂时显示模拟数据
+            const historyEl = document.getElementById('exchangeHistory');
+            historyEl.innerHTML = `
+                <div class="history-item">
+                    <div class="history-info">
+                        <div class="history-name">精美笔记本</div>
+                        <div class="history-time">2026-04-01 10:30</div>
+                    </div>
+                    <div class="history-points">-500</div>
+                </div>
+                <div class="history-item">
+                    <div class="history-info">
+                        <div class="history-name">学习视频会员</div>
+                        <div class="history-time">2026-03-28 15:45</div>
+                    </div>
+                    <div class="history-points">-800</div>
+                </div>
+            `;
+        }
+        
+        // 分类筛选
+        document.querySelectorAll('.filter-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                const category = this.getAttribute('data-category');
+                let filteredProducts = products;
+                
+                if (category !== 'all') {
+                    if (category === 'physical') {
+                        filteredProducts = products.filter(p => !p.is_virtual);
+                    } else if (category === 'virtual') {
+                        filteredProducts = products.filter(p => p.is_virtual);
+                    } else if (category === 'voucher') {
+                        filteredProducts = products.filter(p => p.category_id === 4);
+                    }
+                }
+                
+                renderProducts(filteredProducts);
+            });
+        });
+        
+        // 返回上一页
+        function goBack() {
+            if (document.getElementById('productDetail').classList.contains('show')) {
+                hideProductDetail();
+            } else {
+                window.history.back();
+            }
+        }
+        
+        // 切换底部导航
+        function switchTab(tab) {
+            if (tab === 'points') return;
+            window.location.href = tab === 'home' ? '/ting' : `/ting/${tab}`;
+        }
+        
+        // Toast 提示
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2000);
+        }
+    </script>
+</body>
+</html>
