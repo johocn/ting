@@ -689,6 +689,13 @@
             }
         }
         
+        // 更新导航状态
+        function updateNavState() {
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+        }
+        
         // Toast 提示
         function showToast(message) {
             const toast = document.getElementById('toast');
