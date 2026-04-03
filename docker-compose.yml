@@ -34,7 +34,7 @@ services:
       dockerfile: backend/Dockerfile
     container_name: ting_backend
     ports:
-      - "8000:8000"
+      - "8100:8000"
     environment:
       - DATABASE_URL=postgresql://ting_user:ting_password@postgres:5432/ting_db
       - REDIS_URL=redis://redis:6379
