@@ -14,3 +14,7 @@ from .wechat import (
     WechatTemplateConfig, WechatShareConfig
 )
 from .learning_progress import UserLearningSession, LearningAchievement
+from .sign_notifications import SignRecord, Notification, extend_user_model
+
+# 扩展用户模型
+extend_user_model(User)

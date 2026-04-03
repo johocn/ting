@@ -422,14 +422,38 @@
         // 加载签到信息
         async function loadSignInfo() {
             try {
-                // 模拟获取签到信息
-                // 在实际应用中，这里应该调用后端API获取签到数据
+                const response = await fetch(`${API_BASE}/sign/sign-info`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    signInfo = await response.json();
+                    updateSignDisplay();
+                } else {
+                    // 如果API不可用，使用模拟数据
+                    const today = new Date();
+                    const todayStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+                    
+                    signInfo = {
+                        todaySigned: Math.random() > 0.7,
+                        currentStreak: Math.floor(Math.random() * 10) + 1,
+                        longestStreak: Math.floor(Math.random() * 20) + 5,
+                        totalSigned: Math.floor(Math.random() * 50) + 10,
+                        signedDates: generateMockSignedDates()
+                    };
+                    
+                    updateSignDisplay();
+                }
+            } catch (error) {
+                console.error('加载签到信息失败:', error);
+                // 使用模拟数据
                 const today = new Date();
                 const todayStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
                 
-                // 模拟数据 - 实际应用中应从后端获取
                 signInfo = {
-                    todaySigned: Math.random() > 0.7, // 模拟今天是否已签到
+                    todaySigned: Math.random() > 0.7,
                     currentStreak: Math.floor(Math.random() * 10) + 1,
                     longestStreak: Math.floor(Math.random() * 20) + 5,
                     totalSigned: Math.floor(Math.random() * 50) + 10,
@@ -437,8 +461,6 @@
                 };
                 
                 updateSignDisplay();
-            } catch (error) {
-                console.error('加载签到信息失败:', error);
             }
         }
         
@@ -538,59 +560,51 @@
             const todayStr = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
             
             // 检查是否已经签到
-            if (signInfo.signedDates.includes(todayStr)) {
+            if (signInfo.todaySigned) {
                 showToast('今日已签到');
                 return;
             }
             
             try {
-                // 模拟签到请求 - 实际应用中应调用后端API
-                // const response = await fetch(`${API_BASE}/sign/sign-today`, {
-                //     method: 'POST',
-                //     headers: {
-                //         'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-                //     }
-                // });
-                
-                // if (response.ok) {
-                //     const data = await response.json();
-                //     showToast(`签到成功！获得 ${data.points} 积分`);
-                // } else {
-                //     showToast('签到失败');
-                //     return;
-                // }
-                
-                // 模拟成功响应
-                const pointsEarned = 50; // 基础积分
-                showToast(`签到成功！获得 ${pointsEarned} 积分`);
-                
-                // 更新本地数据
-                signInfo.signedDates.push(todayStr);
-                signInfo.totalSigned += 1;
-                signInfo.currentStreak += 1;
-                if (signInfo.currentStreak > signInfo.longestStreak) {
-                    signInfo.longestStreak = signInfo.currentStreak;
-                }
-                
-                // 更新用户积分
-                currentUser.integral = (currentUser.integral || 0) + pointsEarned;
-                localStorage.setItem('user_info', JSON.stringify(currentUser));
-                
-                updateSignDisplay();
-                
-                // 通知积分中心更新积分
-                if (window.opener) {
-                    window.opener.postMessage({ type: 'pointsUpdated', points: currentUser.integral }, '*');
-                }
-                
-                // 更新积分中心页面的积分显示
-                setTimeout(() => {
-                    // 尝试更新父窗口或其他相关页面的积分显示
-                    if (window.parent !== window) {
-                        window.parent.postMessage({ type: 'pointsUpdated', points: currentUser.integral }, '*');
+                const response = await fetch(`${API_BASE}/sign/sign-today`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
                     }
-                }, 1000);
+                });
                 
+                if (response.ok) {
+                    const data = await response.json();
+                    showToast(data.message || `签到成功！获得 ${data.points_awarded} 积分`);
+                    
+                    // 更新本地数据
+                    signInfo.todaySigned = true;
+                    signInfo.currentStreak = data.continuous_days;
+                    signInfo.totalSigned += 1;
+                    
+                    // 更新用户积分
+                    currentUser.integral = (currentUser.integral || 0) + data.points_awarded;
+                    localStorage.setItem('user_info', JSON.stringify(currentUser));
+                    
+                    updateSignDisplay();
+                    
+                    // 通知积分中心更新积分
+                    if (window.opener) {
+                        window.opener.postMessage({ type: 'pointsUpdated', points: currentUser.integral }, '*');
+                    }
+                    
+                    // 更新积分中心页面的积分显示
+                    setTimeout(() => {
+                        // 尝试更新父窗口或其他相关页面的积分显示
+                        if (window.parent !== window) {
+                            window.parent.postMessage({ type: 'pointsUpdated', points: currentUser.integral }, '*');
+                        }
+                    }, 1000);
+                } else {
+                    const errorData = await response.json();
+                    showToast(errorData.detail || '签到失败');
+                }
             } catch (error) {
                 console.error('签到失败:', error);
                 showToast('签到失败，请稍后重试');

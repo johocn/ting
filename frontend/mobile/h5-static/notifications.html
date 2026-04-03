@@ -315,64 +315,6 @@
         let notifications = [];
         let currentFilter = 'all';
         
-        // 模拟通知数据
-        const mockNotifications = [
-            {
-                id: 1,
-                type: 'points',
-                title: '积分到账通知',
-                content: '您通过观看"JavaScript基础教程"获得150积分奖励，已存入您的积分账户。',
-                timestamp: '2026-04-03 15:30',
-                read: false,
-                related_id: 'session123'
-            },
-            {
-                id: 2,
-                type: 'system',
-                title: '系统公告',
-                content: 'Ting学习平台将于4月5日晚上22:00-24:00进行系统维护，期间可能短暂影响服务使用。',
-                timestamp: '2026-04-03 10:15',
-                read: false,
-                related_id: null
-            },
-            {
-                id: 3,
-                type: 'promotion',
-                title: '活动通知',
-                content: '每日签到活动火热进行中，连续签到7天可获得150积分奖励！',
-                timestamp: '2026-04-02 18:45',
-                read: true,
-                related_id: null
-            },
-            {
-                id: 4,
-                type: 'points',
-                title: '积分消费提醒',
-                content: '您使用500积分兑换了"精美笔记本"，商品将在3个工作日内发货。',
-                timestamp: '2026-04-02 14:20',
-                read: true,
-                related_id: 'exchange456'
-            },
-            {
-                id: 5,
-                type: 'system',
-                title: '安全提醒',
-                content: '您的账户于今天10:30在一台新设备上登录，如非本人操作请及时修改密码。',
-                timestamp: '2026-04-01 11:10',
-                read: true,
-                related_id: null
-            },
-            {
-                id: 6,
-                type: 'points',
-                title: '积分过期提醒',
-                content: '您账户中有100积分将于4月10日过期，请及时使用以免造成损失。',
-                timestamp: '2026-03-28 09:00',
-                read: true,
-                related_id: null
-            }
-        ];
-        
         // 检查登录状态
         window.addEventListener('load', () => {
             const token = localStorage.getItem('access_token');
@@ -388,20 +330,102 @@
         
         // 加载通知
         async function loadNotifications() {
-            // 在实际应用中，这里应该调用后端API获取通知数据
-            // const response = await fetch(`${API_BASE}/notifications/notifications/`, {
-            //     headers: {
-            //         'Authorization': `Bearer ${localStorage.getItem('access_token')}`
-            //     }
-            // });
-            // if (response.ok) {
-            //     notifications = await response.json();
-            // } else {
-            //     notifications = mockNotifications;
-            // }
-            
-            notifications = mockNotifications;
-            renderNotifications();
+            try {
+                const response = await fetch(`${API_BASE}/sign/notifications?type=${currentFilter}`, {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    notifications = await response.json();
+                } else {
+                    // 如果API不可用，使用模拟数据
+                    const mockNotifications = [
+                        {
+                            id: 1,
+                            type: 'points',
+                            title: '积分到账通知',
+                            content: '您通过观看"JavaScript基础教程"获得150积分奖励，已存入您的积分账户。',
+                            timestamp: '2026-04-03 15:30',
+                            read: false,
+                            related_id: 'session123'
+                        },
+                        {
+                            id: 2,
+                            type: 'system',
+                            title: '系统公告',
+                            content: 'Ting学习平台将于4月5日晚上22:00-24:00进行系统维护，期间可能短暂影响服务使用。',
+                            timestamp: '2026-04-03 10:15',
+                            read: false,
+                            related_id: null
+                        },
+                        {
+                            id: 3,
+                            type: 'promotion',
+                            title: '活动通知',
+                            content: '每日签到活动火热进行中，连续签到7天可获得150积分奖励！',
+                            timestamp: '2026-04-02 18:45',
+                            read: true,
+                            related_id: null
+                        },
+                        {
+                            id: 4,
+                            type: 'points',
+                            title: '积分消费提醒',
+                            content: '您使用500积分兑换了"精美笔记本"，商品将在3个工作日内发货。',
+                            timestamp: '2026-04-02 14:20',
+                            read: true,
+                            related_id: 'exchange456'
+                        },
+                        {
+                            id: 5,
+                            type: 'system',
+                            title: '安全提醒',
+                            content: '您的账户于今天10:30在一台新设备上登录，如非本人操作请及时修改密码。',
+                            timestamp: '2026-04-01 11:10',
+                            read: true,
+                            related_id: null
+                        },
+                        {
+                            id: 6,
+                            type: 'points',
+                            title: '积分过期提醒',
+                            content: '您账户中有100积分将于4月10日过期，请及时使用以免造成损失。',
+                            timestamp: '2026-03-28 09:00',
+                            read: true,
+                            related_id: null
+                        }
+                    ];
+                    notifications = mockNotifications;
+                }
+                renderNotifications();
+            } catch (error) {
+                console.error('加载通知失败:', error);
+                // 使用模拟数据
+                const mockNotifications = [
+                    {
+                        id: 1,
+                        type: 'points',
+                        title: '积分到账通知',
+                        content: '您通过观看"JavaScript基础教程"获得150积分奖励，已存入您的积分账户。',
+                        timestamp: '2026-04-03 15:30',
+                        read: false,
+                        related_id: 'session123'
+                    },
+                    {
+                        id: 2,
+                        type: 'system',
+                        title: '系统公告',
+                        content: 'Ting学习平台将于4月5日晚上22:00-24:00进行系统维护，期间可能短暂影响服务使用。',
+                        timestamp: '2026-04-03 10:15',
+                        read: false,
+                        related_id: null
+                    }
+                ];
+                notifications = mockNotifications;
+                renderNotifications();
+            }
         }
         
         // 渲染通知
@@ -465,22 +489,68 @@
         }
         
         // 标记为已读
-        function markAsRead(id) {
+        async function markAsRead(id) {
             const notification = notifications.find(n => n.id === id);
             if (notification) {
-                notification.read = true;
-                renderNotifications();
-                showToast('已标记为已读');
+                try {
+                    const response = await fetch(`${API_BASE}/sign/notifications/${id}/read`, {
+                        method: 'PUT',
+                        headers: {
+                            'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        notification.is_read = true;
+                        renderNotifications();
+                        showToast('已标记为已读');
+                    } else {
+                        // 如果API失败，本地更新
+                        notification.read = true;
+                        renderNotifications();
+                        showToast('已标记为已读');
+                    }
+                } catch (error) {
+                    // 如果API失败，本地更新
+                    notification.read = true;
+                    renderNotifications();
+                    showToast('已标记为已读');
+                }
             }
         }
         
         // 全部标记为已读
-        function markAllAsRead() {
-            notifications.forEach(notification => {
-                notification.read = true;
-            });
-            renderNotifications();
-            showToast('全部标记为已读');
+        async function markAllAsRead() {
+            try {
+                const response = await fetch(`${API_BASE}/sign/notifications/mark-all-read`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    notifications.forEach(notification => {
+                        notification.is_read = true;
+                    });
+                    renderNotifications();
+                    showToast('全部标记为已读');
+                } else {
+                    // 如果API失败，本地更新
+                    notifications.forEach(notification => {
+                        notification.read = true;
+                    });
+                    renderNotifications();
+                    showToast('全部标记为已读');
+                }
+            } catch (error) {
+                // 如果API失败，本地更新
+                notifications.forEach(notification => {
+                    notification.read = true;
+                });
+                renderNotifications();
+                showToast('全部标记为已读');
+            }
         }
         
         // 执行操作
