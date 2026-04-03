@@ -7,6 +7,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="format-detection" content="telephone=no">
     <title>Ting 学习平台</title>
+    <script src="./utils/lazy-load.js"></script>
+    <script src="./utils/ux-enhancements.js"></script>
     <style>
         * {
             margin: 0;
@@ -465,24 +467,19 @@
             const contentList = document.getElementById('contentList');
             
             try {
-                const response = await fetch(API_BASE + '/contents/contents/');
-                if (response.ok) {
-                    const data = await response.json();
-                    contents = Array.isArray(data) ? data : [];
-                    
-                    if (contents.length > 0) {
-                        contentSection.classList.add('show');
-                        contentList.innerHTML = contents.map(item => `
-                            <div class="content-item" onclick="startLearning('${item.id}', '${item.title}')">
-                                <span class="content-title">${item.title}</span>
-                                <span class="content-meta">时长：${formatDuration(item.duration)} | 积分：${item.reward_points_per_minute || 5}/分钟</span>
-                            </div>
-                        `).join('');
-                    } else {
-                        contentList.innerHTML = '<div class="content-item" style="text-align: center; color: #999;">暂无学习内容</div>';
-                    }
+                const data = await window.TingUX.request.request(API_BASE + '/contents/contents/');
+                contents = Array.isArray(data) ? data : [];
+                
+                if (contents.length > 0) {
+                    contentSection.classList.add('show');
+                    contentList.innerHTML = contents.map(item => `
+                        <div class="content-item" onclick="startLearning('${item.id}', '${item.title}')">
+                            <span class="content-title">${item.title}</span>
+                            <span class="content-meta">时长：${formatDuration(item.duration)} | 积分：${item.reward_points_per_minute || 5}/分钟</span>
+                        </div>
+                    `).join('');
                 } else {
-                    contentList.innerHTML = '<div class="content-item" style="text-align: center; color: #f56c6c;">加载失败</div>';
+                    contentList.innerHTML = '<div class="content-item" style="text-align: center; color: #999;">暂无学习内容</div>';
                 }
             } catch (error) {
                 console.error('加载内容失败:', error);
@@ -514,45 +511,37 @@
             const password = document.getElementById('loginPassword').value;
             
             if (!username || !password) {
-                showToast('请填写用户名和密码');
+                window.TingUX.error.showError('请填写用户名和密码', 'error');
                 return;
             }
             
             try {
-                const response = await fetch(API_BASE + '/auth/auth/login', {
+                const data = await window.TingUX.request.request(API_BASE + '/auth/auth/login', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password })
+                    body: JSON.stringify({ username, password }),
+                    loadingMessage: '登录中...'
                 });
                 
-                if (response.ok) {
-                    const data = await response.json();
-                    localStorage.setItem('access_token', data.token);
-                    localStorage.setItem('user_info', JSON.stringify({
-                        id: data.user_id,
-                        username: data.username,
-                        integral: data.integral || 0
-                    }));
-                    
-                    currentUser = {
-                        id: data.user_id,
-                        username: data.username,
-                        integral: data.integral || 0
-                    };
-                    
-                    hideLoginModal();
-                    showUserInfo();
-                    loadContents();
-                    showToast('登录成功');
-                } else {
-                    const error = await response.json();
-                    showToast(error.detail || '登录失败');
-                }
+                localStorage.setItem('access_token', data.token);
+                localStorage.setItem('user_info', JSON.stringify({
+                    id: data.user_id,
+                    username: data.username,
+                    integral: data.integral || 0
+                }));
+                
+                currentUser = {
+                    id: data.user_id,
+                    username: data.username,
+                    integral: data.integral || 0
+                };
+                
+                hideLoginModal();
+                showUserInfo();
+                loadContents();
+                window.TingUX.error.showError('登录成功', 'success');
             } catch (error) {
                 console.error('登录失败:', error);
-                showToast('网络连接失败');
+                window.TingUX.error.showError('登录失败', 'error');
             }
         }
         
@@ -563,30 +552,23 @@
             const password = document.getElementById('registerPassword').value;
             
             if (!username || !password) {
-                showToast('请填写用户名和密码');
+                window.TingUX.error.showError('请填写用户名和密码', 'error');
                 return;
             }
             
             try {
-                const response = await fetch(API_BASE + '/auth/auth/register', {
+                const data = await window.TingUX.request.request(API_BASE + '/auth/auth/register', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ username, password, phone })
+                    body: JSON.stringify({ username, password, phone }),
+                    loadingMessage: '注册中...'
                 });
                 
-                if (response.ok) {
-                    showToast('注册成功，请登录');
-                    hideRegisterModal();
-                    showLoginModal();
-                } else {
-                    const error = await response.json();
-                    showToast(error.detail || '注册失败');
-                }
+                window.TingUX.error.showError('注册成功，请登录', 'success');
+                hideRegisterModal();
+                showLoginModal();
             } catch (error) {
                 console.error('注册失败:', error);
-                showToast('网络连接失败');
+                window.TingUX.error.showError('注册失败', 'error');
             }
         }
         

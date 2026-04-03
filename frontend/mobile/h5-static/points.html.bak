@@ -9,8 +9,6 @@
     <title>积分中心 - Ting 学习平台</title>
     <script src="./utils/lazy-load.js"></script>
     <script src="./utils/ux-enhancements.js"></script>
-    <script src="./utils/lazy-load.js"></script>
-    <script src="./utils/ux-enhancements.js"></script>
     <style>
         * {
             margin: 0;

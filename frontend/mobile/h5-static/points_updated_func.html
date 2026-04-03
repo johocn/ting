@@ -1,0 +1,39 @@
+        // 加载积分流水
+        async function loadTransactions() {
+            const listEl = document.getElementById('transactionList');
+            listEl.innerHTML = '<div class="empty-state">加载中...</div>';
+            
+            try {
+                const data = await window.TingUX.request.request(API_BASE + '/points/points/transactions?skip=0&limit=50', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+                    },
+                    loadingMessage: '加载积分流水...'
+                });
+                
+                const transactions = Array.isArray(data) ? data : [];
+                
+                if (transactions.length > 0) {
+                    listEl.innerHTML = transactions.map(item => `
+                        <div class="transaction-item">
+                            <div class="transaction-info">
+                                <span class="transaction-type ${item.transaction_type === 'earn' ? 'earn' : 'spend'}">
+                                    ${item.transaction_type === 'earn' ? '+' : '-'}${Math.abs(item.points_change)}
+                                </span>
+                                <span class="transaction-desc">${item.description || getOperationText(item.operation_type)}</span>
+                            </div>
+                            <div class="transaction-meta">
+                                <span class="transaction-time">${formatDate(item.created_at)}</span>
+                                <span class="transaction-tag">${getOperationText(item.operation_type)}</span>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    listEl.innerHTML = '<div class="empty-state">暂无积分记录</div>';
+                }
+            } catch (error) {
+                console.error('加载流水失败:', error);
+                listEl.innerHTML = '<div class="empty-state">加载失败</div>';
+                window.TingUX.error.showError('加载积分流水失败', 'error');
+            }
+        }
