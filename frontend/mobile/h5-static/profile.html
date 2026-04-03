@@ -265,6 +265,12 @@
                 <span class="arrow">›</span>
             </div>
             
+            <div class="menu-item" onclick="goToAnalytics()">
+                <span class="menu-icon">📊</span>
+                <span class="menu-text">数据分析</span>
+                <span class="arrow">›</span>
+            </div>
+            
             <div class="menu-item" onclick="showAbout()">
                 <span class="menu-icon">ℹ️</span>
                 <span class="menu-text">关于我们</span>
@@ -343,6 +349,11 @@
         // 前往学习历史
         function goToLearningHistory() {
             window.location.href = '/ting/history.html';
+        }
+        
+        // 前往数据分析
+        function goToAnalytics() {
+            window.location.href = '/ting/analytics.html';
         }
         
         // 显示消息

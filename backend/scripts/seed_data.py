@@ -14,10 +14,10 @@ def seed_data():
     try:
         # 添加商品类别
         categories = [
-            {"name": "实体商品", "description": "实物商品"},
-            {"name": "虚拟商品", "description": "在线服务或虚拟物品"},
-            {"name": "优惠券", "description": "折扣或优惠券"},
-            {"name": "学习资料", "description": "电子书或学习材料"}
+            {"name": "实体商品"},
+            {"name": "虚拟商品"},
+            {"name": "优惠券"},
+            {"name": "学习资料"}
         ]
         
         for cat_data in categories:
@@ -133,7 +133,6 @@ def seed_data():
                 "url": "https://example.com/js-basics.mp4",
                 "duration": 1800,
                 "category": "编程",
-                "description": "JavaScript编程语言基础知识讲解",
                 "reward_points_per_minute": 5,
                 "status": True
             },
@@ -142,7 +141,6 @@ def seed_data():
                 "url": "https://example.com/python-advanced.mp4",
                 "duration": 2700,
                 "category": "编程",
-                "description": "Python高级编程技巧和最佳实践",
                 "reward_points_per_minute": 6,
                 "status": True
             },
@@ -151,7 +149,6 @@ def seed_data():
                 "url": "https://example.com/vue-practice.mp4",
                 "duration": 2400,
                 "category": "前端",
-                "description": "Vue.js框架实战开发项目",
                 "reward_points_per_minute": 5,
                 "status": True
             },
@@ -160,7 +157,6 @@ def seed_data():
                 "url": "https://example.com/node-intro.mp4",
                 "duration": 1800,
                 "category": "后端",
-                "description": "Node.js服务端开发入门教程",
                 "reward_points_per_minute": 5,
                 "status": True
             },
@@ -169,7 +165,6 @@ def seed_data():
                 "url": "https://example.com/react-basics.mp4",
                 "duration": 2100,
                 "category": "前端",
-                "description": "React框架基础概念和使用方法",
                 "reward_points_per_minute": 5,
                 "status": True
             },
@@ -178,7 +173,6 @@ def seed_data():
                 "url": "https://example.com/algorithms.mp4",
                 "duration": 3000,
                 "category": "算法",
-                "description": "常见算法和数据结构讲解",
                 "reward_points_per_minute": 6,
                 "status": True
             },
@@ -187,7 +181,6 @@ def seed_data():
                 "url": "https://example.com/css-layout.mp4",
                 "duration": 1500,
                 "category": "前端",
-                "description": "CSS布局的各种技巧和最佳实践",
                 "reward_points_per_minute": 4,
                 "status": True
             },
@@ -196,7 +189,6 @@ def seed_data():
                 "url": "https://example.com/db-design.mp4",
                 "duration": 2400,
                 "category": "后端",
-                "description": "数据库设计的基本原理和实践",
                 "reward_points_per_minute": 6,
                 "status": True
             }

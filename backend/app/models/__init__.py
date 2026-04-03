@@ -15,6 +15,7 @@ from .wechat import (
 )
 from .learning_progress import UserLearningSession, LearningAchievement
 from .sign_notifications import SignRecord, Notification, extend_user_model
+from .analytics import UserBehavior, ConversionRate, UserEngagement
 
 # 扩展用户模型
 extend_user_model(User)
