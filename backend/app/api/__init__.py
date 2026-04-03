@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api import auth, users, contents, quizzes, points, channels, hierarchy, verification
+from app.api import auth, users, contents, quizzes, points, channels, hierarchy, verification, learning_progress
 
 router = APIRouter()
 
@@ -12,3 +12,4 @@ router.include_router(points.router, prefix="/points", tags=["points"])
 router.include_router(channels.router, prefix="/channels", tags=["channels"])
 router.include_router(hierarchy.router, prefix="/hierarchy", tags=["hierarchy"])
 router.include_router(verification.router, prefix="/verification", tags=["verification"])
+router.include_router(learning_progress.router, prefix="/learning", tags=["learning"])

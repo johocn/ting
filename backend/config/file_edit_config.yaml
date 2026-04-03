@@ -1,0 +1,88 @@
+# 安全文件编辑配置
+# 用于配置 SafeFileEditor 的行为参数
+
+# 通用设置
+GENERAL:
+  # 备份文件保留数量
+  BACKUP_COUNT: 5
+  
+  # 重试次数
+  MAX_RETRIES: 5
+  
+  # 初始延迟时间（秒）
+  INITIAL_DELAY: 0.1
+  
+  # 是否启用详细日志
+  VERBOSE_LOGGING: true
+
+# 文件编辑策略
+EDIT_STRATEGIES:
+  # 默认策略
+  DEFAULT:
+    backup: true
+    max_retries: 3
+    delay: 0.1
+    
+  # 小文件策略 (< 10KB)
+  SMALL_FILE:
+    backup: true
+    max_retries: 2
+    delay: 0.05
+    
+  # 大文件策略 (>= 10KB)
+  LARGE_FILE:
+    backup: true
+    max_retries: 5
+    delay: 0.2
+    
+  # 关键文件策略 (模型文件、配置文件等)
+  CRITICAL_FILE:
+    backup: true
+    max_retries: 10
+    delay: 0.5
+    integrity_check: true
+
+# 文件类型配置
+FILE_TYPES:
+  python:
+    extensions: ['.py']
+    strategy: DEFAULT
+    syntax_check: true
+    
+  json:
+    extensions: ['.json']
+    strategy: DEFAULT
+    syntax_check: true
+    
+  yaml:
+    extensions: ['.yaml', '.yml']
+    strategy: DEFAULT
+    syntax_check: true
+    
+  text:
+    extensions: ['.txt', '.md', '.cfg', '.conf']
+    strategy: DEFAULT
+    syntax_check: false
+
+# 特殊文件路径配置
+CRITICAL_PATHS:
+  - "*/models/*"           # 模型文件
+  - "*/database/*"         # 数据库相关
+  - "*/config/*"           # 配置文件
+  - "*/settings*"          # 设置文件
+  - "*requirements*.txt"    # 依赖文件
+  - "*Dockerfile*"         # Docker文件
+  - "*docker-compose*.yml" # Docker Compose文件
+
+# 编辑保护规则
+PROTECTION_RULES:
+  # 防止意外的大规模更改
+  SIZE_CHANGE_LIMIT: 3.0  # 新内容大小不应超过原内容的3倍
+  
+  # 防止空文件写入
+  PREVENT_EMPTY_WRITE: true
+  
+  # 防止某些危险模式
+  DANGEROUS_PATTERNS:
+    - "^[\ \t]*[^#\n]"  # 非注释的顶级代码
+    - "import[\\s]+os[\\s]+as[\\s]+"  # 潜在的恶意导入

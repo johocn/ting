@@ -50,18 +50,23 @@ services:
     networks:
       - ting_network
 
-  # 前端管理后台
+  # 管理员前端
   admin-frontend:
-    build:
-      context: .
-      dockerfile: frontend/admin/Dockerfile
+    image: nginx:alpine
     container_name: ting_admin_frontend
+    volumes:
+      - ./frontend/admin/dist:/usr/share/nginx/html
     ports:
       - "3000:80"
-    environment:
-      - VUE_APP_API_BASE_URL=http://localhost:8000/api/v1
+    networks:
+      - ting_network
+
+  # 移动端H5前端
+  mobile-frontend:
+    image: nginx:alpine
+    container_name: ting_mobile_frontend
     volumes:
-      - ./frontend/admin:/app
+      - ./frontend/mobile/uniapp/dist/build/h5:/usr/share/nginx/html
     networks:
       - ting_network
 

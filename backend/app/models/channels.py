@@ -1,8 +1,6 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, JSON, UniqueConstraint
-from sqlalchemy.ext.declarative import declarative_base
 from datetime import datetime
-
-Base = declarative_base()
+from app.database import Base
 
 class ChannelType(Base):
     __tablename__ = "channel_types"
@@ -26,6 +24,7 @@ class Channel(Base):
     commission_rate = Column(Integer, default=0)  # 佣金比例
     invite_link = Column(Text)  # 邀请链接
     qr_code_url = Column(Text)  # 二维码链接
+    logo_url = Column(Text)  # Logo链接
     settings = Column(JSON)  # 渠道设置
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)

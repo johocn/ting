@@ -1,4 +1,5 @@
 const { defineConfig } = require('@vue/cli-service')
+const path = require('path')
 
 module.exports = defineConfig({
   transpileDependencies: true,
@@ -51,24 +52,22 @@ module.exports = defineConfig({
   chainWebpack: config => {
     // 配置别名
     config.resolve.alias
-      .set('@', resolve('src'))
-      .set('@assets', resolve('src/assets'))
-      .set('@components', resolve('src/components'))
-      .set('@views', resolve('src/views'))
-      .set('@utils', resolve('src/utils'))
-      .set('@api', resolve('src/api'))
+      .set('@', path.join(__dirname, 'src'))
+      .set('@assets', path.join(__dirname, 'src/assets'))
+      .set('@components', path.join(__dirname, 'src/components'))
+      .set('@views', path.join(__dirname, 'src/views'))
+      .set('@utils', path.join(__dirname, 'src/utils'))
+      .set('@api', path.join(__dirname, 'src/api'))
     
     // 优化图片处理
     config.module
       .rule('images')
       .use('url-loader')
       .tap(options => {
-        options.limit = 4096
+        if (options) {
+          options.limit = 4096
+        }
         return options
       })
   }
 })
-
-function resolve(dir) {
-  return require('path').join(__dirname, dir)
-}

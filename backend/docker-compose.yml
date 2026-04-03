@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  ting-backend:
+    build: .
+    container_name: ting_backend
+    ports:
+      - "8001:8000"
+    environment:
+      - DATABASE_URL=postgresql://ting_user:ting_password@ting_postgres:5432/ting_db
+      - REDIS_URL=redis://ting_redis:6379/0
+      - SECRET_KEY=your-super-secret-key-change-this-in-production
+      - DEBUG=false
+    volumes:
+      - ./logs:/app/logs
+      - ./uploads:/app/uploads
+    networks:
+      - ting-network
+    depends_on:
+      - ting_postgres
+      - ting_redis
+    restart: unless-stopped
+
+  ting_postgres:
+    image: postgres:13
+    container_name: ting_backend_postgres
+    environment:
+      - POSTGRES_DB=ting_db
+      - POSTGRES_USER=ting_user
+      - POSTGRES_PASSWORD=ting_password
+    volumes:
+      - ./data/postgres:/var/lib/postgresql/data
+    networks:
+      - ting-network
+    restart: unless-stopped
+
+  ting_redis:
+    image: redis:6-alpine
+    container_name: ting_backend_redis
+    volumes:
+      - ./data/redis:/data
+    command: redis-server --appendonly yes
+    networks:
+      - ting-network
+    restart: unless-stopped
+
+networks:
+  ting-network:
+    driver: bridge
+    name: ting_backend_network

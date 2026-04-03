@@ -13,7 +13,4 @@ from .wechat import (
     WechatApp, WechatUser, WechatInviteCode, WechatInviteRecord,
     WechatTemplateConfig, WechatShareConfig
 )
-
-# 导入Base以确保所有模型都被注册
-from sqlalchemy.ext.declarative import declarative_base
-Base = declarative_base()
+from .learning_progress import UserLearningSession, LearningAchievement

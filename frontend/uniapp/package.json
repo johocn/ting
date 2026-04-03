@@ -1,0 +1,31 @@
+{
+  "name": "ting-uniapp-frontend",
+  "version": "1.0.0",
+  "description": "Ting Learning Platform Uniapp Frontend",
+  "main": "main.js",
+  "scripts": {
+    "dev": "uni -dev",
+    "build": "uni -build",
+    "dev:app": "uni -dev app",
+    "build:app": "uni -build app",
+    "dev:h5": "uni -dev h5",
+    "build:h5": "uni -build h5",
+    "dev:mp-weixin": "uni -dev mp-weixin",
+    "build:mp-weixin": "uni -build mp-weixin"
+  },
+  "dependencies": {
+    "vue": "^3.2.45",
+    "@dcloudio/uni-app": "^3.0.0-alpha-3000020221109001",
+    "@dcloudio/uni-h5": "^3.0.0-alpha-3000020221109001",
+    "@dcloudio/uni-app-plus": "^3.0.0-alpha-3000020221109001"
+  },
+  "devDependencies": {
+    "@dcloudio/uni-cli-shared": "^3.0.0-alpha-3000020221109001",
+    "@dcloudio/uni-stacktracey": "^3.0.0-alpha-3000020221109001",
+    "@dcloudio/vue-cli-plugin-uni": "^3.0.0-alpha-3000020221109001",
+    "@vue/cli-plugin-babel": "~4.5.0",
+    "@vue/cli-service": "~4.5.0",
+    "@vue/compiler-sfc": "^3.2.45",
+    "vue-loader": "^16.0.0"
+  }
+}
